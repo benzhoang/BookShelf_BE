@@ -9,6 +9,6 @@ const UserSchema = new Schema({
   password: { type: String, required: true},
   roleID: { type: Schema.ObjectId, ref: "Role" },
   isActive: { type: Boolean, default: true },
-});
+}, {versionKey: false});
 
 module.exports = mongoose.model("User", UserSchema);

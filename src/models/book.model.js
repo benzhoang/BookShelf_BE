@@ -9,6 +9,6 @@ const BookSchema = new Schema({
     actorID: {type: Schema.ObjectId, ref: "Actor"},
     categoryID: {type: Schema.ObjectId, ref: "Category"},
     bookMediaID: {type: Schema.Types.ObjectId, ref: "BookMedia"}
-})
+}, {versionKey: false})
 
 module.exports = mongoose.model("Book", BookSchema);
