@@ -1,0 +1,317 @@
+openapi: 3.0.0
+info:
+  title: Swagger API Documents
+  description: API manager
+  version: 1.0.0
+
+tags:
+  - name: auth
+  - name: actors
+  - name: books
+  - name: bookmedias
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+paths:
+  # API Actors =================================================
+  /api/actors:
+    get:
+      summary: Get all actors
+      tags:
+        - actors
+      responses:
+        "200":
+          description: List of all actors
+          content:
+            application/json:
+              schema:
+                type: object
+
+    post:
+      summary: Create a new actor
+      tags:
+        - actors
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                actorName:
+                  type: string
+              example: { "actorName": "George R.R. Martin" }
+      responses:
+        "201":
+          description: Actor created successfully!!!
+        "400":
+          description: Actor name already in data!!!
+
+  /api/actors/{id}:
+    get:
+      summary: Get an actor by ID
+      tags:
+        - actors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Actor details
+          content:
+            application/json:
+              schema:
+                type: object
+              properties: {}
+        "404":
+          description: Actor not found
+
+    put:
+      summary: Update an actor by ID
+      tags:
+        - actors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            properties:
+              actorName:
+                type: string
+            example: { "actorName": "Update in here" }
+      responses:
+        "200":
+          description: Actor updated successfully
+        "404":
+          description: Actor not found
+
+    delete:
+      summary: Delete an actor by ID
+      tags:
+        - actors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Actor deleted successfully
+        "404":
+          description: Actor id don't exits
+        "400":
+          description: Bad resquest in data
+
+  # API BookMedia =========================================================
+  /api/bookmedias:
+    get:
+      summary: Get all book media
+      tags:
+        - bookmedias
+      responses:
+        "200":
+          description: List of all book media
+          content:
+            application/json:
+              schema:
+                type: object
+
+    post:
+      summary: Create a new book media
+      tags:
+        - bookmedias
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                origin:
+                  type: string
+              example: { "origin": "Viet Nam" }
+      responses:
+        "201":
+          description: Book media origin created successfully!!!
+        "404":
+          description: Book media origin already in data!!!
+
+  /api/bookmedia/{id}:
+    get:
+      summary: Get an book media by ID
+      tags:
+        - bookmedias
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Book media details
+          content:
+            application/json:
+              schema:
+                type: object
+              properties: {}
+        "404":
+          description: Book media not found
+
+    put:
+      summary: Update an book media by ID
+      tags:
+        - bookmedias
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            properties:
+              origin:
+                type: string
+            example: { "origin": "Update in here" }
+      responses:
+        "200":
+          description: Book media updated successfully
+        "404":
+          description: Book media not found
+
+    delete:
+      summary: Delete an book media by ID
+      tags:
+        - bookmedias
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Book media deleted successfully
+        "404":
+          description: Book media id don't exits
+        "400":
+          description: Bad resquest in data
+
+  # API Books ===========================================================
+  /api/books:
+    get:
+      summary: Get all books
+      tags:
+        - books
+      responses:
+        "200":
+          description: List of all books
+          content:
+            application/json:
+              schema:
+                type: array
+                
+
+    post:
+      summary: Create a new book
+      tags:
+        - books
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            properties: 
+              bookName:
+                type: string
+              description:
+                type: string
+              price:
+                type: decimal
+              quantity:
+                type: interger
+              example: {
+                "bookName" : "",
+                "description": "",
+                "price": "",
+                "quantity": "",
+              }
+      responses:
+        "201":
+          description: Book created successfully
+
+components:
+  schemas:
+    Actor:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "12345"
+        name:
+          type: string
+          example: "Leonardo DiCaprio"
+        age:
+          type: integer
+          example: 47
+        movies:
+          type: array
+          items:
+            type: string
+          example: ["Titanic", "Inception"]
+
+    BookMedia:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "67890"
+        title:
+          type: string
+          example: "Harry Potter and the Sorcerer's Stone"
+        author:
+          type: string
+          example: "J.K. Rowling"
+        format:
+          type: string
+          example: "eBook"
+        url:
+          type: string
+          example: "https://example.com/harrypotter"
+
+    Book:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "45678"
+        title:
+          type: string
+          example: "The Great Gatsby"
+        author:
+          type: string
+          example: "F. Scott Fitzgerald"
+        genre:
+          type: string
+          example: "Classic"
