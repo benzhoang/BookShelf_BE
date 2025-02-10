@@ -261,6 +261,47 @@ paths:
         "201":
           description: Book created successfully
 
+  /api/books/{id}:
+    get:
+      summary: Get an books by ID
+      tags:
+        - books
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Book details
+          content:
+            application/json:
+              schema:
+                type: object
+              properties: {}
+        "404":
+          description: Books not found
+
+    delete:
+      summary: Delete an books by ID
+      tags:
+        - books
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Book deleted successfully
+        "404":
+          description: Book id don't exits
+        "400":
+          description: Bad resquest in data
+
+
 components:
   schemas:
     Actor:

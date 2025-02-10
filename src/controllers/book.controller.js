@@ -17,26 +17,40 @@ exports.getAllBooks = async (req, res) => {
   }
 };
 
-// exports.createBook = async (req, res) => {
-//   try {
-//     const { productName, description, price, categoryID } = req.body;
+exports.createBook = async (req, res) => {
+  try {
+    const { bookName, description, price, categoryName, actorName, origin, imageURL } = req.body;
 
-//     const newBook = new Book({
-//       productName,
-//       description,
-//       price,
-//       categoryID,
-//     });
-//     await newBook.save();
+    if (!categoryName || !actorName || !origin) {
+      return res.status(400).json({ message: "Category, actor, and origin are required!" });
+    }
 
-//     res
-//       .status(201)
-//       .json({ message: "Create book successfully!!!", book: newBook });
-//   } catch (error) {
-//     console.error("Error creating product:", error);
-//     res.status(400).json({ message: error.message });
-//   }
-// };
+    const category = await Category.findOne({ name: categoryName });
+    const actor = await Actor.findOne({ name: actorName });
+    const bookMedia = await BookMedia.findOne({ origin });
+
+    if (!category) return res.status(404).json({ message: "Category not found!" });
+    if (!actor) return res.status(404).json({ message: "Actor not found!" });
+    if (!bookMedia) return res.status(404).json({ message: "Book media not found!" });
+
+    const newBook = new Book({
+      bookName,
+      description,
+      price,
+      imageURL, 
+      categoryID: category._id,
+      actorID: actor._id,
+      bookMediaID: bookMedia._id,
+    });
+
+    await newBook.save();
+
+    res.status(201).json({ message: "Book created successfully!", book: newBook });
+  } catch (error) {
+    console.error("Error creating book:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
 
 exports.deleteBook = async (req, res) => {
   try {
@@ -53,7 +67,11 @@ exports.deleteBook = async (req, res) => {
 
 exports.getBookById = async (req, res) => {
   try {
-    const book = await Book.findById(req.params.id).populate("categoryID");
+    const book = await Book.findById(req.params.id).populate([
+      { path: "categoryID" },
+      { path: "bookMediaID" },
+      { path: "actorID" },
+    ]);
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
     } else {
