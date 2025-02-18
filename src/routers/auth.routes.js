@@ -3,8 +3,8 @@ const passport = require("passport");
 const AuthController = require("../controllers/auth.controller");
 const {
   authenticate,
-  isAdmin,
-  isUser,
+  authorizeAdmin,
+  authorizeStaff,
 } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
@@ -23,19 +23,24 @@ router.get(
     res.json({ success: true, token: req.user.token });
   }
 );
+// Login
+router.post("/login", AuthController.Login);
+
+// Register
+router.post("/register", AuthController.Register);
 
 // Logout
-router.get("/logout", AuthController.logout);
+router.post("/logout", authenticate, AuthController.Logout);
 
 // Get current user
-router.get("/user", AuthController.getCurrentUser);
+router.get("/getMe", authenticate, AuthController.getMe);
 
 // 🔒 Protected Routes
-router.get("/admin/dashboard", authenticate, isAdmin, (req, res) => {
+router.get("/admin/dashboard", authenticate, authorizeAdmin, (req, res) => {
   res.json({ message: "Welcome to Admin Dashboard" });
 });
 
-router.get("/user/dashboard", authenticate, isUser, (req, res) => {
+router.get("/user/dashboard", authenticate, (req, res) => {
   res.json({ message: "Welcome to User Dashboard" });
 });
 

@@ -15,6 +15,53 @@ servers:
     description: Local development server
 
 paths:
+  # API Auth
+  /api/auth/login:
+    post:
+      summary: Login by email and password
+      tags:
+        - auth
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              poperties:
+                email:
+                  type: String
+                password:
+                  type: String
+              example: { "email": "abc@gmail.com", "password": "abcde" }
+      responses:
+        "201":
+          description: login successfully!!!
+        "400":
+          description: Login Failed!!!
+
+  /api/auth/getMe:
+    get:
+      summary: Get profile
+      tags:
+        - auth
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Bearer token
+      responses:
+        "200":
+          description: Profile user
+          content:
+            application/json:
+              schema:
+                type: object
+
   # API Actors =================================================
   /api/actors:
     get:
@@ -230,7 +277,6 @@ paths:
             application/json:
               schema:
                 type: array
-                
 
     post:
       summary: Create a new book
@@ -242,7 +288,7 @@ paths:
           application/json:
             schema:
               type: object
-            properties: 
+            properties:
               bookName:
                 type: string
               description:
@@ -251,12 +297,13 @@ paths:
                 type: decimal
               quantity:
                 type: interger
-              example: {
-                "bookName" : "",
-                "description": "",
-                "price": "",
-                "quantity": "",
-              }
+              example:
+                {
+                  "bookName": "",
+                  "description": "",
+                  "price": "",
+                  "quantity": "",
+                }
       responses:
         "201":
           description: Book created successfully
@@ -300,7 +347,6 @@ paths:
           description: Book id don't exits
         "400":
           description: Bad resquest in data
-
 
 components:
   schemas:

@@ -1,8 +1,13 @@
 const express = require("express");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
+require("dotenv").config();
 const app = express();
-const port = 3000;
+
+const PORT = process.env.PORT;
+
+const session = require("express-session");
+const passport = require("passport");
 
 // CONFIG MONGODB
 const db = require("./configs/db.config");
@@ -10,6 +15,9 @@ db.connect();
 
 app.use(bodyParser.json());
 app.use(morgan("dev"));
+
+// SETUP MIDDELEWARE
+app.use(passport.initialize());
 
 // IMPORT ROUTER *****************************************
 const BookRouter = require("./routers/book.routes");
@@ -26,9 +34,7 @@ const swaggerPath = path.join(__dirname, "swagger", "apiDocs.yaml");
 const swaggerDocument = YAML.load(swaggerPath);
 
 // SETUP GOOGLE ****************************************
-const session = require("express-session");
-const passport = require("passport");
-require("dotenv").config();
+
 require("./configs/passport.config");
 
 app.use(
@@ -64,7 +70,7 @@ app.get("/dashboard", (req, res) => {
 // SWAGGER API DOCS
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-  console.log(`Swagger docs available at http://localhost:${port}/api-docs`);
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
 });
