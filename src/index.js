@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const app = express();
-const port = 3000;
+const port = 5000;
 
 // CONFIG MONGODB
 const db = require("./configs/db.config");
@@ -24,6 +24,13 @@ const YAML = require("yamljs");
 const path = require("path");
 const swaggerPath = path.join(__dirname, "swagger", "apiDocs.yaml");
 const swaggerDocument = YAML.load(swaggerPath);
+// Tự động cập nhật URL server theo môi trường
+swaggerDocument.servers = [
+  {
+      url: process.env.SERVER_URL || "http://localhost:3000",
+      description: "Server tự động nhận đường dẫn"
+  }
+];
 
 // SETUP GOOGLE ****************************************
 const session = require("express-session");
