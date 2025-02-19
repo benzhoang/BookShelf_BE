@@ -11,7 +11,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 const SERVER_URL = NODE_ENV === 'production'
   ? process.env.SERVER_URL_PROD
-  : process.env.SERVER_URL_LOCAL;
+  : `${PROTOCOL}://${HOST}:${PORT}`;
 
 const session = require("express-session");
 const passport = require("passport");
