@@ -1,38 +1,45 @@
 const jwt = require("jsonwebtoken");
+const passportJWT = require("passport-jwt");
+const passport = require("passport");
 require("dotenv").config();
 const User = require("../models/user.model");
 
-// Middleware to verify JWT token and attach user to req
-exports.authenticate = async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1]; // Extract token from "Bearer <token>"
+const secretKey = "your-secret-key";
 
-  if (!token) {
-    return res.status(401).json({ success: false, message: "Access Denied. No Token Provided." });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id).select("-password"); // Attach user to request
-    if (!req.user) return res.status(404).json({ success: false, message: "User not found." });
-
-    next();
-  } catch (error) {
-    res.status(401).json({ success: false, message: "Invalid Token" });
-  }
+const jwtOptions = {
+  jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: secretKey,
 };
 
-// Middleware to check Admin role
-exports.isAdmin = (req, res, next) => {
-  if (req.user.roleID !== "Admin") {
-    return res.status(403).json({ success: false, message: "Forbidden: Admins only." });
+const jwtStrategy = new passportJWT.Strategy(
+  jwtOptions,
+  async (payload, done) => {
+    try {
+      const user = await User.findById(payload.sub);
+      if (user) return done(null, user);
+      return done(null, false);
+    } catch (err) {
+      return done(err, false);
+    }
+  }
+);
+
+passport.use(jwtStrategy);
+
+const authenticate = passport.authenticate("jwt", { session: false });
+
+const authorizeAdmin = (req, res, next) => {
+  if (req.user.role !== "Admin") {
+    return res.status(403).json({ message: "Access denied" });
   }
   next();
 };
 
-// Middleware to check User role
-exports.isUser = (req, res, next) => {
-  if (req.user.roleID !== "User") {
-    return res.status(403).json({ success: false, message: "Forbidden: Users only." });
+const authorizeStaff = (req, res, next) => {
+  if (req.user.role !== "Staff") {
+    return res.status(403).json({ message: "Access denied" });
   }
   next();
 };
+
+module.exports = { authenticate, authorizeAdmin, authorizeStaff, secretKey };

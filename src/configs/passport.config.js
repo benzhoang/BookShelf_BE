@@ -4,13 +4,18 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const User = require("../models/user.model");
 require("dotenv").config();
 
+// Debugging: Check if environment variables are loaded correctly
+if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+  throw new Error("Missing Google OAuth credentials in .env file.");
+}
+
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: "http://localhost:3000/api/auth/google/callback",
-      passReqToCallback: true, // ✅ Ensures req is available
+      passReqToCallback: true,
     },
     async (req, accessToken, refreshToken, profile, done) => {
       try {
@@ -20,9 +25,9 @@ passport.use(
           user = await User.create({
             userName: profile.displayName,
             email: profile.emails[0].value,
-            password: profile.emails[0].value, // Consider hashing this if needed
+            password: profile.emails[0].value, // Consider hashing
             isVerified: true,
-            role: req.query?.state?.split(',')[0] || "User",
+            role: req.query?.state?.split(",")[0] || "User",
           });
         }
 
@@ -33,12 +38,10 @@ passport.use(
           { expiresIn: "1d" }
         );
 
-        // Attach token to the user object (optional)
         user.token = token;
-
         return done(null, user);
       } catch (err) {
-        console.error("Google Auth Error:", err); // Debugging
+        console.error("Google Auth Error:", err);
         return done(err, false);
       }
     }
