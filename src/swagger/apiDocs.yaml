@@ -10,9 +10,7 @@ tags:
   - name: books
   - name: bookmedias
 
-servers:
-  - url: http://localhost:3000
-    description: Local development server
+servers: []
 
 paths:
   # API Auth
