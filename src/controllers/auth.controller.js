@@ -3,6 +3,41 @@ const jwt = require("jsonwebtoken");
 const { authenticate, secretKey } = require("../middlewares/auth.middleware");
 const { token } = require("morgan");
 
+exports.googleAuthCallback = async (req, res) => {
+  if (!req.user) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Authentication failed" });
+  }
+
+  try {
+    // Generate access token
+    const accessToken = jwt.sign(
+      { id: req.user._id, role: req.user.role },
+      secretKey,
+      { expiresIn: "15m" } // Short-lived access token (15 minutes)
+    );
+
+    // Generate refresh token
+    const refreshToken = jwt.sign(
+      { id: req.user._id },
+      secretKey,
+      { expiresIn: "7d" } // Longer-lived refresh token (7 days)
+    );
+
+    // Save refresh token in the database
+    await User.findByIdAndUpdate(req.user._id, {
+      $push: { refreshToken: refreshToken },
+    });
+
+    // Return both tokens
+    res.json({ success: true, accessToken, refreshToken });
+  } catch (error) {
+    console.error("Error processing authentication:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 exports.Register = async (req, res) => {
   try {
     const { userName, email, password, role } = req.body;

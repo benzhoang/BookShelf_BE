@@ -1,11 +1,13 @@
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const { Strategy: JwtStrategy, ExtractJwt } = require("passport-jwt");
+const { Strategy: GoogleStrategy } = require("passport-google-oauth20");
 const User = require("../models/user.model");
+const { secretKey } = require("../middlewares/auth.middleware");
 require("dotenv").config();
 
 const jwtOptions = {
-  secretOrKey: process.env.SECRET_KEY,
+  secretOrKey: secretKey,
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 };
 const jwtVerify = async (payload, done) => {
