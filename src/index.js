@@ -4,14 +4,13 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 const app = express();
 
-const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || 'localhost';
-const PROTOCOL = process.env.PROTOCOL || 'http';
-const NODE_ENV = process.env.NODE_ENV || 'development';
+const PORT = process.env.SERVER_URL_PROD || 3000;
 
-const SERVER_URL = NODE_ENV === 'production'
+console.log(process.env.NODE_ENV)
+
+const SERVER_URL = process.env.NODE_ENV === 'production'
   ? process.env.SERVER_URL_PROD
-  : `${PROTOCOL}://${HOST}:${PORT}`;
+  : `http://localhost:${PORT}`;
 
 const session = require("express-session");
 const passport = require("passport");
@@ -84,7 +83,7 @@ app.get("/dashboard", (req, res) => {
 // SWAGGER API DOCS
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.listen(PORT, HOST, () => {
+app.listen(PORT, () => {
   console.log(`Server running on ${SERVER_URL}`);
   console.log(`Swagger docs available at ${SERVER_URL}/api-docs`);
 });
