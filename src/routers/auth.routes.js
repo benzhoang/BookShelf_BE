@@ -23,6 +23,7 @@ router.get(
     res.json({ success: true, token: req.user.token });
   }
 );
+
 // Login
 router.post("/login", AuthController.Login);
 

@@ -40,6 +40,45 @@ paths:
         "400":
           description: Login Failed!!!
 
+  /api/auth/register:
+    post:
+      summary: Register
+      tags:
+        - auth
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              poperties:
+                userName:
+                  type: String
+                email:
+                  type: String
+                password:
+                  type: String
+                role:
+                  type: String
+              required:
+                - userName
+                - email
+                - password
+                - role
+              example:
+                {
+                  "userName": "abcxyz",
+                  "email": "abc@gmail.com",
+                  "password": "abcde",
+                  "role": "User",
+                }
+      responses:
+        "201":
+          description: Register successfully!!!
+        "400":
+          description: Register Failed!!!
+
   /api/auth/getMe:
     get:
       summary: Get profile

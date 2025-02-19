@@ -7,9 +7,11 @@ exports.Register = async (req, res) => {
   try {
     const { userName, email, password, role } = req.body;
 
-    if (!userName || !email || !password || !role) {
-      return res.status(400).json({ message: "Required!!!" });
-    }
+    const existingUser = await User.findOne({ email });
+    if (existingUser)
+      return res.status(400).json({ message: "Email already exits!!!" });
+
+    // const user = await User.findOne({ refreshToken: { $in: [refreshToken] } });
 
     const newUser = new User({
       userName,
@@ -47,7 +49,7 @@ exports.Login = async (req, res) => {
     user.accessToken = accessToken;
     await user.save();
 
-    res.json({ accessToken, refreshToken });
+    res.status(200).json({ accessToken, refreshToken });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -64,22 +66,27 @@ exports.getMe = async (req, res) => {
 exports.Logout = async (req, res) => {
   try {
     const { refreshToken } = req.body;
-
-    if (!req.user || !req.user.refreshToken) {
-      return res.status(401).json({ message: "Unauthorized" });
+    if (!refreshToken) {
+      return res.status(400).json({ message: "Refresh token is required" });
     }
 
-    // Filter out the provided refresh token
-    req.user.refreshToken = req.user.refreshToken.filter(
+    // Find user who has this refreshToken
+    const user = await User.findOne({ refreshToken: { $in: [refreshToken] } });
+    console.log(user);
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid refresh token" });
+    }
+
+    // Remove the refreshToken from user's list
+    user.refreshToken = user.refreshToken.filter(
       (token) => token !== refreshToken
     );
+    user.accessToken = []; // Clear access tokens as well
+    await user.save();
 
-    await req.user.save();
-
-    res.status(200).json({ message: "Logout successfully!" });
+    res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
