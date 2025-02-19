@@ -1,6 +1,7 @@
 const express = require("express");
 const passport = require("passport");
 const AuthController = require("../controllers/auth.controller");
+const jwt = require("jsonwebtoken");
 const {
   authenticate,
   authorizeAdmin,
@@ -9,19 +10,19 @@ const {
 
 const router = express.Router();
 
-// Google Authentication
 router.get(
   "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    state: "user",
+  }) // Ensure state has a default value
 );
 
+// Google callback route
 router.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
-  (req, res) => {
-    res.redirect("/dashboard");
-    res.json({ success: true, token: req.user.token });
-  }
+  AuthController.googleAuthCallback
 );
 
 // Login

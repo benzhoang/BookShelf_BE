@@ -4,49 +4,64 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const User = require("../models/user.model");
 require("dotenv").config();
 
-// Debugging: Check if environment variables are loaded correctly
-if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-  throw new Error("Missing Google OAuth credentials in .env file.");
-}
-
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:3000/api/auth/google/callback",
-      passReqToCallback: true,
-    },
-    async (req, accessToken, refreshToken, profile, done) => {
-      try {
-        let user = await User.findOne({ email: profile.emails[0].value });
-
-        if (!user) {
-          user = await User.create({
-            userName: profile.displayName,
-            email: profile.emails[0].value,
-            password: profile.emails[0].value, // Consider hashing
-            isVerified: true,
-            role: req.query?.state?.split(",")[0] || "User",
-          });
-        }
-
-        // Generate JWT Token
-        const token = jwt.sign(
-          { id: user._id, role: user.role },
-          process.env.JWT_SECRET,
-          { expiresIn: "1d" }
-        );
-
-        user.token = token;
-        return done(null, user);
-      } catch (err) {
-        console.error("Google Auth Error:", err);
-        return done(err, false);
-      }
+const jwtOptions = {
+  secretOrKey: process.env.SECRET_KEY,
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+};
+const jwtVerify = async (payload, done) => {
+  try {
+    const user = await User.findById(payload.userID);
+    if (!user) {
+      return done(null, false);
     }
-  )
+    done(null, user);
+  } catch (error) {
+    done(error, false);
+  }
+};
+
+const jwtStrategy = new JwtStrategy(jwtOptions, jwtVerify);
+
+const googleStrategy = new GoogleStrategy(
+  {
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.GOOGLE_CALLBACK_URL,
+    passReqToCallback: true,
+  },
+  async (req, accessToken, refreshToken, profile, done) => {
+    try {
+      const user = await User.findOne({ email: profile.emails[0].value });
+
+      if (user) {
+        return done(null, user);
+      }
+
+      const validRoles = ["Admin", "User", "Staff"];
+      const role = req.query.state
+        ? validRoles.find(
+            (r) => r.toLowerCase() === req.query.state.toLowerCase()
+          ) || "User"
+        : "User";
+
+      const newUser = await User.create({
+        userName: profile.displayName,
+        email: profile.emails[0].value,
+        password: profile.emails[0].value,
+        isActive: true,
+        role,
+      });
+
+      return done(null, newUser);
+    } catch (err) {
+      console.error("Google Auth Error:", err);
+      return done(err, false);
+    }
+  }
 );
+
+passport.use(jwtStrategy);
+passport.use(googleStrategy);
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -60,3 +75,5 @@ passport.deserializeUser(async (id, done) => {
     done(err, null);
   }
 });
+
+module.exports = { jwtStrategy, googleStrategy };
