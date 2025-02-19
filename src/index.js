@@ -6,8 +6,6 @@ const app = express();
 
 const PORT = process.env.PORT;
 
-console.log(process.env.NODE_ENV)
-
 const SERVER_URL = process.env.NODE_ENV === 'production'
   ? process.env.SERVER_URL_PROD
   : `http://localhost:${PORT}`;
