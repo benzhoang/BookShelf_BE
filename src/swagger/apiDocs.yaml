@@ -78,6 +78,46 @@ paths:
           description: Register successfully!!!
         "400":
           description: Register Failed!!!
+  /api/auth/login/google:
+    post:
+      summary: login with google
+      deprecated: false
+      description: ""
+      tags:
+        - auth
+      parameters:
+        - name: role
+          in: query
+          description: ""
+          required: true
+          example: saa
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+            example:
+              email: Agustin_Ward@hotmail.com
+              password: "1234567890"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
 
   /api/auth/getMe:
     get:

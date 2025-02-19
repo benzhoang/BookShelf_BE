@@ -1,45 +1,39 @@
-const jwt = require("jsonwebtoken");
-const passportJWT = require("passport-jwt");
+// auth.middleware.js
 const passport = require("passport");
-require("dotenv").config();
+const { ExtractJwt, Strategy: JwtStrategy } = require("passport-jwt");
 const User = require("../models/user.model");
+require("dotenv").config();
 
-const secretKey = "your-secret-key";
+const secretKey = process.env.SECRET_KEY || "your-secret-key";
 
 const jwtOptions = {
-  jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: secretKey,
 };
 
-const jwtStrategy = new passportJWT.Strategy(
-  jwtOptions,
-  async (payload, done) => {
+passport.use(
+  new JwtStrategy(jwtOptions, async (payload, done) => {
     try {
       const user = await User.findById(payload.sub);
-      if (user) return done(null, user);
-      return done(null, false);
+      return done(null, user || false);
     } catch (err) {
       return done(err, false);
     }
-  }
+  })
 );
-
-passport.use(jwtStrategy);
 
 const authenticate = passport.authenticate("jwt", { session: false });
 
-const authorizeAdmin = (req, res, next) => {
-  if (req.user.role !== "Admin") {
+const authorizeRole = (role) => (req, res, next) => {
+  if (req.user?.role !== role) {
     return res.status(403).json({ message: "Access denied" });
   }
   next();
 };
 
-const authorizeStaff = (req, res, next) => {
-  if (req.user.role !== "Staff") {
-    return res.status(403).json({ message: "Access denied" });
-  }
-  next();
+module.exports = {
+  authenticate,
+  authorizeAdmin: authorizeRole("Admin"),
+  authorizeStaff: authorizeRole("Staff"),
+  secretKey,
 };
-
-module.exports = { authenticate, authorizeAdmin, authorizeStaff, secretKey };
