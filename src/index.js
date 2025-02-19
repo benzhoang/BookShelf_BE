@@ -4,7 +4,9 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 const app = express();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || 'localhost';
+const PROTOCOL = process.env.PROTOCOL || 'http';
 
 const session = require("express-session");
 const passport = require("passport");
@@ -32,6 +34,13 @@ const YAML = require("yamljs");
 const path = require("path");
 const swaggerPath = path.join(__dirname, "swagger", "apiDocs.yaml");
 const swaggerDocument = YAML.load(swaggerPath);
+// Tự động cập nhật URL server theo môi trường
+swaggerDocument.servers = [
+  {
+    url: `${PROTOCOL}://${HOST}:${PORT}`,
+    description: "Server tự động nhận đường dẫn"
+  }
+];
 
 // SETUP GOOGLE ****************************************
 
@@ -70,7 +79,7 @@ app.get("/dashboard", (req, res) => {
 // SWAGGER API DOCS
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-  console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
+app.listen(PORT, HOST, () => {
+  console.log(`Server running on ${PROTOCOL}://${HOST}:${PORT}`);
+  console.log(`Swagger docs available at ${PROTOCOL}://${HOST}:${PORT}/api-docs`);
 });
