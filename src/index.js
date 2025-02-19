@@ -7,6 +7,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || 'localhost';
 const PROTOCOL = process.env.PROTOCOL || 'http';
+const NODE_ENV = process.env.NODE_ENV || 'development';
+
+const SERVER_URL = NODE_ENV === 'production'
+  ? process.env.SERVER_URL_PROD
+  : process.env.SERVER_URL_LOCAL;
 
 const session = require("express-session");
 const passport = require("passport");
@@ -37,7 +42,7 @@ const swaggerDocument = YAML.load(swaggerPath);
 // Tự động cập nhật URL server theo môi trường
 swaggerDocument.servers = [
   {
-    url: `${PROTOCOL}://${HOST}:${PORT}`,
+    url: SERVER_URL,
     description: "Server tự động nhận đường dẫn"
   }
 ];
@@ -80,6 +85,6 @@ app.get("/dashboard", (req, res) => {
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.listen(PORT, HOST, () => {
-  console.log(`Server running on ${PROTOCOL}://${HOST}:${PORT}`);
-  console.log(`Swagger docs available at ${PROTOCOL}://${HOST}:${PORT}/api-docs`);
+  console.log(`Server running on ${SERVER_URL}`);
+  console.log(`Swagger docs available at ${SERVER_URL}/api-docs`);
 });
