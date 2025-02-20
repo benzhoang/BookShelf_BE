@@ -35,6 +35,20 @@ const authorizeAdmin = (req, res, next) => {
   next();
 };
 
+const authorizeManager = (req, res, next) => {
+  if (req.user.role !== "Manager") {
+    return res.status(403).json({ message: "Access denied" });
+  }
+  next();
+};
+
+const authorizeCustomer = (req, res, next) => {
+  if (req.user.role !== "Customer") {
+    return res.status(403).json({ message: "Access denied" });
+  }
+  next();
+};
+
 const authorizeStaff = (req, res, next) => {
   if (req.user.role !== "Staff") {
     return res.status(403).json({ message: "Access denied" });
@@ -42,4 +56,4 @@ const authorizeStaff = (req, res, next) => {
   next();
 };
 
-module.exports = { authenticate, authorizeAdmin, authorizeStaff, secretKey };
+module.exports = { authenticate, authorizeAdmin, authorizeManager, authorizeStaff, authorizeCustomer, secretKey };

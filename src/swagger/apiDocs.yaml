@@ -6,8 +6,11 @@ info:
 
 tags:
   - name: auth
+  - name: users
   - name: actors
   - name: books
+  - name: categories
+  - name: locations
   - name: bookmedias
 
 servers: []
@@ -98,7 +101,40 @@ paths:
             application/json:
               schema:
                 type: object
-
+  #API Users====================================================
+  /api/users:
+    get:
+      summary: Get all users
+      tags:
+        - users
+      responses:
+        "200":
+          description: List of all users
+          content:
+            application/json:
+              schema:
+                type: object
+  /api/users/{id}:
+    get:
+      summary: Get an users by ID
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User details
+          content:
+            application/json:
+              schema:
+                type: object
+              properties: {}
+        "404":
+          description: User not found
   # API Actors =================================================
   /api/actors:
     get:
@@ -385,57 +421,83 @@ paths:
         "400":
           description: Bad resquest in data
 
-components:
-  schemas:
-    Actor:
-      type: object
-      properties:
-        id:
-          type: string
-          example: "12345"
-        name:
-          type: string
-          example: "Leonardo DiCaprio"
-        age:
-          type: integer
-          example: 47
-        movies:
-          type: array
-          items:
-            type: string
-          example: ["Titanic", "Inception"]
+  #API Category============================================
+  /api/categories:
+    get:
+      summary: Get all categories
+      tags:
+        - categories
+      responses:
+        "200":
+          description: List of all categories
+          content:
+            application/json:
+              schema:
+                type: array
+  #API Category============================================
+  /api/locations:
+    get:
+      summary: Get all locations
+      tags:
+        - locations
+      responses:
+        "200":
+          description: List of all locations
+          content:
+            application/json:
+              schema:
+                type: array
+# components:
+#   schemas:
+#     Actor:
+#       type: object
+#       properties:
+#         id:
+#           type: string
+#           example: "12345"
+#         name:
+#           type: string
+#           example: "Leonardo DiCaprio"
+#         age:
+#           type: integer
+#           example: 47
+#         movies:
+#           type: array
+#           items:
+#             type: string
+#           example: ["Titanic", "Inception"]
 
-    BookMedia:
-      type: object
-      properties:
-        id:
-          type: string
-          example: "67890"
-        title:
-          type: string
-          example: "Harry Potter and the Sorcerer's Stone"
-        author:
-          type: string
-          example: "J.K. Rowling"
-        format:
-          type: string
-          example: "eBook"
-        url:
-          type: string
-          example: "https://example.com/harrypotter"
+#     BookMedia:
+#       type: object
+#       properties:
+#         id:
+#           type: string
+#           example: "67890"
+#         title:
+#           type: string
+#           example: "Harry Potter and the Sorcerer's Stone"
+#         author:
+#           type: string
+#           example: "J.K. Rowling"
+#         format:
+#           type: string
+#           example: "eBook"
+#         url:
+#           type: string
+#           example: "https://example.com/harrypotter"
 
-    Book:
-      type: object
-      properties:
-        id:
-          type: string
-          example: "45678"
-        title:
-          type: string
-          example: "The Great Gatsby"
-        author:
-          type: string
-          example: "F. Scott Fitzgerald"
-        genre:
-          type: string
-          example: "Classic"
+#     Book:
+#       type: object
+#       properties:
+#         id:
+#           type: string
+#           example: "45678"
+#         title:
+#           type: string
+#           example: "The Great Gatsby"
+#         author:
+#           type: string
+#           example: "F. Scott Fitzgerald"
+#         genre:
+#           type: string
+#           example: "Classic"

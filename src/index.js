@@ -25,7 +25,10 @@ app.use(passport.initialize());
 
 // IMPORT ROUTER *****************************************
 const BookRouter = require("./routers/book.routes");
+const CategoryRouter = require('./routers/category.routes')
+const LocationRouter = require('./routers/location.routes')
 const UserRouter = require("./routers/user.routes");
+const RoleRouter = require('./routers/role.routes')
 const BookMediaRouter = require("./routers/bookMedia.routes");
 const ActorRouter = require("./routers/actor.routes");
 const AuthRouter = require("./routers/auth.routes");
@@ -66,7 +69,10 @@ app.get("/", (req, res) => {
 
 // CALL API ROUTER
 app.use("/api/books", BookRouter);
+app.use("/api/categories", CategoryRouter);
+app.use("/api/locations", LocationRouter);
 app.use("/api/users", UserRouter);
+app.use("/api/roles", RoleRouter);
 app.use("/api/bookmedias", BookMediaRouter);
 app.use("/api/actors", ActorRouter);
 app.use("/api/auth", AuthRouter);
