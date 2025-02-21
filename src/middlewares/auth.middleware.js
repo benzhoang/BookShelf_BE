@@ -1,4 +1,3 @@
-// auth.middleware.js
 const passport = require("passport");
 const { ExtractJwt, Strategy: JwtStrategy } = require("passport-jwt");
 const User = require("../models/user.model");
@@ -14,9 +13,10 @@ const jwtOptions = {
 passport.use(
   new JwtStrategy(jwtOptions, async (payload, done) => {
     try {
-      const user = await User.findById(payload.sub);
+      const user = await User.findById(payload.id);
       return done(null, user || false);
     } catch (err) {
+      console.error("JWT Authentication Error:", err);
       return done(err, false);
     }
   })
@@ -24,8 +24,15 @@ passport.use(
 
 const authenticate = passport.authenticate("jwt", { session: false });
 
-const authorizeRole = (role) => (req, res, next) => {
-  if (req.user?.role !== role) {
+const authorizeAdmin = (req, res, next) => {
+  if (req.user.role !== "Admin") {
+    return res.status(403).json({ message: "Access denied" });
+  }
+  next();
+};
+
+const authorizeStaff = (req, res, next) => {
+  if (req.user.role !== "Staff") {
     return res.status(403).json({ message: "Access denied" });
   }
   next();
@@ -33,7 +40,7 @@ const authorizeRole = (role) => (req, res, next) => {
 
 module.exports = {
   authenticate,
-  authorizeAdmin: authorizeRole("Admin"),
-  authorizeStaff: authorizeRole("Staff"),
+  authorizeAdmin,
+  authorizeStaff,
   secretKey,
 };
