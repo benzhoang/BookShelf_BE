@@ -24,6 +24,7 @@
     "passport-jwt": "^4.0.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
+    "testcode": "file:",
     "yamljs": "^0.3.0"
   }
 }

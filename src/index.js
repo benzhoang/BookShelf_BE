@@ -32,6 +32,7 @@ const RoleRouter = require('./routers/role.routes')
 const BookMediaRouter = require("./routers/bookMedia.routes");
 const ActorRouter = require("./routers/actor.routes");
 const AuthRouter = require("./routers/auth.routes");
+const UploadImg = require("./routers/upLoadImg.routes")
 
 // SETTUP SWAGGER
 const swaggerUi = require("swagger-ui-express");
@@ -76,6 +77,7 @@ app.use("/api/roles", RoleRouter);
 app.use("/api/bookmedias", BookMediaRouter);
 app.use("/api/actors", ActorRouter);
 app.use("/api/auth", AuthRouter);
+app.use("/api/uploadImg", UploadImg)
 
 app.get("/dashboard", (req, res) => {
   if (!req.isAuthenticated()) {

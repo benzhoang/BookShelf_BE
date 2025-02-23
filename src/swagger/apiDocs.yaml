@@ -12,6 +12,7 @@ tags:
   - name: categories
   - name: locations
   - name: bookmedias
+  - name: uploadImg
 
 servers: []
 
@@ -336,6 +337,44 @@ paths:
           description: Book media id don't exits
         "400":
           description: Bad resquest in data
+#API uploadImage for book
+  /api/uploadImg:
+    post:
+      summary: Upload book images to Cloudinary
+      tags:
+        - uploadImg
+      description: Upload multiple images and get their URLs.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Upload multiple images
+      responses:
+        "200":
+          description: Images uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Images uploaded successfully!"
+                  imageUrls:
+                    type: array
+                    items:
+                      type: string
+                      example: "https://res.cloudinary.com/.../image.png"
+        "400":
+          description: Image upload failed
 
   # API Books ===========================================================
   /api/books:
@@ -353,33 +392,57 @@ paths:
 
     post:
       summary: Create a new book
-      tags:
+      tags: 
         - books
+      description: Create a new book with image URLs from Cloudinary.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-            properties:
-              bookName:
-                type: string
-              description:
-                type: string
-              price:
-                type: decimal
-              quantity:
-                type: interger
-              example:
-                {
-                  "bookName": "",
-                  "description": "",
-                  "price": "",
-                  "quantity": "",
-                }
+              properties:
+                bookName:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                categoryName:
+                  type: string
+                actorName:
+                  type: string
+                origin:
+                  type: string
+                imageUrls:
+                  type: array
+                  items:
+                    type: string
+                    example: "https://res.cloudinary.com/.../image.png"
+              required:
+                - bookName
+                - description
+                - price
+                - categoryName
+                - actorName
+                - origin
       responses:
         "201":
           description: Book created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Book created successfully!"
+                  book:
+                    type: object
+        "400":
+          description: Invalid input data
+        "500":
+          description: Internal server error
 
   /api/books/{id}:
     get:
@@ -434,7 +497,7 @@ paths:
             application/json:
               schema:
                 type: array
-  #API Category============================================
+  #API Locations============================================
   /api/locations:
     get:
       summary: Get all locations
