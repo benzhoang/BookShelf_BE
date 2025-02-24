@@ -26,8 +26,8 @@ exports.createBook = async (req, res) => {
       return res.status(400).json({ message: "Category, actor, and origin are required!" });
     }
 
-    const category = await Category.findOne({ categoryName });
-    const actor = await Actor.findOne({ actorName });
+    const category = await Category.findOne({ categoryName: categoryName });
+    const actor = await Actor.findOne({ actorName: actorName });
     const bookMedia = await BookMedia.findOne({ origin });
 
     if (!category) return res.status(404).json({ message: "Category not found!" });

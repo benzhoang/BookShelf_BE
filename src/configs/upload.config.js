@@ -14,7 +14,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-        folder: "uploads", // Thư mục trên Cloudinary
+        folder: "bookshelf", // Thư mục trên Cloudinary
         format: async (req, file) => file.mimetype.split("/")[1],
         public_id: (req, file) => Date.now() + "_" + file.originalname, // Đặt tên file duy nhất
     },
