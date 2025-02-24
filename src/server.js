@@ -76,7 +76,7 @@ app.get("/", (req, res) => {
 // CORS Configuration
 app.use(
   cors({
-    origin: process.env.LOCAL_HOST_URL, // Allow frontend
+    origin: "http://localhost:3000", // Allow frontend
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true, // Allow cookies/auth headers
   })
