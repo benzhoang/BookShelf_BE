@@ -1,39 +1,45 @@
 const express = require("express");
 const passport = require("passport");
 const AuthController = require("../controllers/auth.controller");
-const {
-  authenticate,
-  authorizeAdmin,
-  authorizeStaff,
-} = require("../middlewares/auth.middleware");
+const { authenticate, authorizeAdmin } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
-// Google Authentication
+// 🌐 Google OAuth Login
 router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+  "/login/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    state: "User", // Ensures a default role
+  })
 );
 
 router.get(
-  "/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
-  (req, res) => {
-    res.redirect("/dashboard");
-    res.json({ success: true, token: req.user.token });
-  }
+  "/login/google/callback",
+  (req, res, next) => {
+    passport.authenticate("google", { session: false }, (err, user) => {
+      if (err || !user) {
+        return res.redirect(req.query.state?.split(",")[1]);
+      }
+      req.user = user;
+      next();
+    })(req, res, next);
+  },
+  AuthController.googleAuthCallback
 );
 
-// Login
+
+
+// 🔑 Standard Login
 router.post("/login", AuthController.Login);
 
-// Register
+// 🔑 Register
 router.post("/register", AuthController.Register);
 
-// Logout
+// 🚪 Logout
 router.post("/logout", authenticate, AuthController.Logout);
 
-// Get current user
+// 👤 Get current user
 router.get("/getMe", authenticate, AuthController.getMe);
 
 // 🔒 Protected Routes

@@ -1,30 +1,26 @@
-const jwt = require("jsonwebtoken");
-const passportJWT = require("passport-jwt");
 const passport = require("passport");
-require("dotenv").config();
+const { ExtractJwt, Strategy: JwtStrategy } = require("passport-jwt");
 const User = require("../models/user.model");
+require("dotenv").config();
 
-const secretKey = "your-secret-key";
+const secretKey = process.env.SECRET_KEY || "your-secret-key";
 
 const jwtOptions = {
-  jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: secretKey,
 };
 
-const jwtStrategy = new passportJWT.Strategy(
-  jwtOptions,
-  async (payload, done) => {
+passport.use(
+  new JwtStrategy(jwtOptions, async (payload, done) => {
     try {
-      const user = await User.findById(payload.sub);
-      if (user) return done(null, user);
-      return done(null, false);
+      const user = await User.findById(payload.id);
+      return done(null, user || false);
     } catch (err) {
+      console.error("JWT Authentication Error:", err);
       return done(err, false);
     }
-  }
+  })
 );
-
-passport.use(jwtStrategy);
 
 const authenticate = passport.authenticate("jwt", { session: false });
 
@@ -56,4 +52,13 @@ const authorizeStaff = (req, res, next) => {
   next();
 };
 
+<<<<<<< HEAD
 module.exports = { authenticate, authorizeAdmin, authorizeManager, authorizeStaff, authorizeCustomer, secretKey };
+=======
+module.exports = {
+  authenticate,
+  authorizeAdmin,
+  authorizeStaff,
+  secretKey,
+};
+>>>>>>> 917f88ffe5ea0f24e66a0f3e34ea1418312f66ea
