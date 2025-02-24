@@ -8,17 +8,11 @@ const app = express();
 
 const PORT = process.env.PORT;
 
-<<<<<<< HEAD:src/index.js
+const Router = require("./routers/index")
+
 const SERVER_URL = process.env.NODE_ENV === 'production'
   ? process.env.SERVER_URL_PROD
   : `http://localhost:${PORT}`;
-
-const session = require("express-session");
-const passport = require("passport");
-=======
-// IMPORT ROUTER
-const Router = require("./routers/index");
->>>>>>> 917f88ffe5ea0f24e66a0f3e34ea1418312f66ea:src/server.js
 
 // CONFIG MONGODB
 const db = require("./configs/db.config");
@@ -30,20 +24,6 @@ app.use(morgan("dev"));
 // SETUP MIDDELEWARE
 app.use(passport.initialize());
 
-<<<<<<< HEAD:src/index.js
-// IMPORT ROUTER *****************************************
-const BookRouter = require("./routers/book.routes");
-const CategoryRouter = require('./routers/category.routes')
-const LocationRouter = require('./routers/location.routes')
-const UserRouter = require("./routers/user.routes");
-const RoleRouter = require('./routers/role.routes')
-const BookMediaRouter = require("./routers/bookMedia.routes");
-const ActorRouter = require("./routers/actor.routes");
-const AuthRouter = require("./routers/auth.routes");
-const UploadImg = require("./routers/upLoadImg.routes")
-
-=======
->>>>>>> 917f88ffe5ea0f24e66a0f3e34ea1418312f66ea:src/server.js
 // SETTUP SWAGGER
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
@@ -74,24 +54,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-<<<<<<< HEAD:src/index.js
-app.get("/", (req, res) => {
-  res.status(200).json({ message: "Welcome to Back-end project!!!" });
-});
-
-// CALL API ROUTER
-app.use("/api/books", BookRouter);
-app.use("/api/categories", CategoryRouter);
-app.use("/api/locations", LocationRouter);
-app.use("/api/users", UserRouter);
-app.use("/api/roles", RoleRouter);
-app.use("/api/bookmedias", BookMediaRouter);
-app.use("/api/actors", ActorRouter);
-app.use("/api/auth", AuthRouter);
-app.use("/api/uploadImg", UploadImg)
-
-=======
->>>>>>> 917f88ffe5ea0f24e66a0f3e34ea1418312f66ea:src/server.js
 app.get("/dashboard", (req, res) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ message: "Unauthorized" });

@@ -52,13 +52,4 @@ const authorizeStaff = (req, res, next) => {
   next();
 };
 
-<<<<<<< HEAD
 module.exports = { authenticate, authorizeAdmin, authorizeManager, authorizeStaff, authorizeCustomer, secretKey };
-=======
-module.exports = {
-  authenticate,
-  authorizeAdmin,
-  authorizeStaff,
-  secretKey,
-};
->>>>>>> 917f88ffe5ea0f24e66a0f3e34ea1418312f66ea

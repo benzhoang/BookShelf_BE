@@ -4,6 +4,9 @@ const UserRouter = require("./user.routes");
 const BookMediaRouter = require("./bookMedia.routes");
 const ActorRouter = require("./actor.routes");
 const AuthRouter = require("./auth.routes");
+const UploadRouter = require("./upLoadImg.routes")
+const CategoryRouter = require('./category.routes')
+const LocationRouter = require('./location.routes')
 
 const {
   authenticate,
@@ -18,6 +21,9 @@ function Router(app) {
   app.use("/api/bookmedias", BookMediaRouter);
   app.use("/api/actors", authorizeAdmin, ActorRouter);
   app.use("/api/auth", AuthRouter);
+  app.use("/api/uploadImg", UploadRouter);
+  app.use('/api/categories', CategoryRouter);
+  app.use('/api/locations', LocationRouter)
 }
 
 module.exports = Router;
