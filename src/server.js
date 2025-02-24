@@ -4,15 +4,17 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 const session = require("express-session");
 const passport = require("passport");
+const cors = require("cors");
 const app = express();
 
 const PORT = process.env.PORT;
 
-const Router = require("./routers/index")
+const Router = require("./routers/index");
 
-const SERVER_URL = process.env.NODE_ENV === 'production'
-  ? process.env.SERVER_URL_PROD
-  : `http://localhost:${PORT}`;
+const SERVER_URL =
+  process.env.NODE_ENV === "production"
+    ? process.env.SERVER_URL_PROD
+    : `http://localhost:${PORT}`;
 
 // CONFIG MONGODB
 const db = require("./configs/db.config");
@@ -34,8 +36,8 @@ const swaggerDocument = YAML.load(swaggerPath);
 swaggerDocument.servers = [
   {
     url: SERVER_URL,
-    description: "Server tự động nhận đường dẫn"
-  }
+    description: "Server tự động nhận đường dẫn",
+  },
 ];
 
 // SETUP GOOGLE ****************************************
@@ -70,6 +72,15 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Welcome to Back-end project!!!" });
 });
+
+// CORS Configuration
+app.use(
+  cors({
+    origin: process.env.LOCAL_HOST_URL, // Allow frontend
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true, // Allow cookies/auth headers
+  })
+);
 
 app.listen(PORT, () => {
   console.log(`Server running on ${SERVER_URL}`);
