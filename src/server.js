@@ -8,8 +8,11 @@ const app = express();
 
 const PORT = process.env.PORT;
 
-// IMPORT ROUTER
-const Router = require("./routers/index");
+const Router = require("./routers/index")
+
+const SERVER_URL = process.env.NODE_ENV === 'production'
+  ? process.env.SERVER_URL_PROD
+  : `http://localhost:${PORT}`;
 
 // CONFIG MONGODB
 const db = require("./configs/db.config");
@@ -27,6 +30,13 @@ const YAML = require("yamljs");
 const path = require("path");
 const swaggerPath = path.join(__dirname, "swagger", "apiDocs.yaml");
 const swaggerDocument = YAML.load(swaggerPath);
+// Tự động cập nhật URL server theo môi trường
+swaggerDocument.servers = [
+  {
+    url: SERVER_URL,
+    description: "Server tự động nhận đường dẫn"
+  }
+];
 
 // SETUP GOOGLE ****************************************
 
@@ -62,6 +72,6 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-  console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
+  console.log(`Server running on ${SERVER_URL}`);
+  console.log(`Swagger docs available at ${SERVER_URL}/api-docs`);
 });

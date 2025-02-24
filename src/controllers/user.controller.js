@@ -11,7 +11,7 @@ exports.getAllUser = async (req, res) => {
 
 exports.getUserById = async (req, res)=> {
   try {
-    const user = await User.findById(req.params.id).populate("roleID");
+    const user = await User.findById(req.params.id).populate("role");
     if(!user) return res.status(404).json({message: "User not found!!!"})
       console.log("User not found with ID:", req.params.id);
       res.status(200).json(user);

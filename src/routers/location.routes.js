@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const CategoryController = require("../controllers/category.controller");
+const LocationController = require("../controllers/location.controller");
 
 
-router.get("/", CategoryController.getAllCategory);
+router.get("/", LocationController.getAllLocation);
 // router.post("/", BookController.createBook);
 // router.get("/:id", BookController.getBookById);
 // router.delete("/:id", BookController.deleteBook);
