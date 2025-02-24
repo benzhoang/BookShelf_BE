@@ -40,13 +40,16 @@ passport.use(
 
         if (!user) {
           const validRoles = ["Admin", "User", "Staff"];
-          const requestedRole = req.query.state?.charAt(0).toUpperCase() + req.query.state?.slice(1);
-          const role = validRoles.includes(requestedRole) ? requestedRole : "User";
+          const requestedRole =
+            req.query.state?.charAt(0).toUpperCase() +
+            req.query.state?.slice(1);
+          const role = validRoles.includes(requestedRole)
+            ? requestedRole
+            : "User";
 
           user = await User.create({
             userName: profile.displayName,
             email,
-            password: null, 
             isActive: true,
             role,
           });

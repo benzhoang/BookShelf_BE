@@ -13,7 +13,7 @@ const {
 
 function Router(app) {
   // CALL API ROUTER
-  app.use("/api/books", authenticate, authorizeAdmin, BookRouter);
+  app.use("/api/books", BookRouter);
   app.use("/api/users", UserRouter);
   app.use("/api/bookmedias", BookMediaRouter);
   app.use("/api/actors", authorizeAdmin, ActorRouter);

@@ -19,7 +19,7 @@ router.get(
   (req, res, next) => {
     passport.authenticate("google", { session: false }, (err, user) => {
       if (err || !user) {
-        return res.redirect(req.query.state?.split(",")[1] || "/login-failed");
+        return res.redirect(req.query.state?.split(",")[1]);
       }
       req.user = user;
       next();
@@ -27,6 +27,8 @@ router.get(
   },
   AuthController.googleAuthCallback
 );
+
+
 
 // 🔑 Standard Login
 router.post("/login", AuthController.Login);
