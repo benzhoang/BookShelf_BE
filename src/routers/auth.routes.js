@@ -13,7 +13,7 @@ router.get(
   "/login/google",
   passport.authenticate("google", {
     scope: ["profile", "email"],
-    state: "User", // Ensures a default role
+    state: "Customer", // Ensures a default role
   })
 );
 
