@@ -10,7 +10,7 @@ const {
     authorizeStaff,
 } = require("../middlewares/auth.middleware");
 
-router.get("/", authorizeAdmin, InvoiceController.getAllInvoice);
+router.get("/", authenticate, authorizeAdmin, InvoiceController.getAllInvoice);
 router.post("/", authorizeCustomer, InvoiceController.createInvoice);
 router.get("/:id", InvoiceController.getInvoiceById);
 router.delete("/:id", authorizeAdmin, InvoiceController.deleteInvoice);

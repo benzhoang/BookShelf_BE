@@ -26,8 +26,8 @@ function Router(app) {
   app.use("/api/uploadImg", UploadRouter);
   app.use('/api/categories', CategoryRouter);
   app.use('/api/locations', LocationRouter);
-  app.use('/api/invoice', InvoiceRouter);
-  app.use('/api/payment', PaymentRouter)
+  app.use('/api/invoices', InvoiceRouter);
+  app.use('/api/payments', PaymentRouter)
 }
 
 module.exports = Router;
