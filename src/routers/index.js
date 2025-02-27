@@ -19,7 +19,7 @@ function Router(app) {
   app.use("/api/books", BookRouter);
   app.use("/api/users", UserRouter);
   app.use("/api/bookmedias", BookMediaRouter);
-  app.use("/api/actors", authorizeAdmin, ActorRouter);
+  app.use("/api/actors", ActorRouter);
   app.use("/api/auth", AuthRouter);
   app.use("/api/uploadImg", UploadRouter);
   app.use('/api/categories', CategoryRouter);

@@ -8,7 +8,7 @@ const {
   authorizeStaff,
 } = require("../middlewares/auth.middleware");
 
-router.get("/", authorizeAdmin, authenticate, ActorController.getAllActor);
+router.get("/", authenticate, authorizeAdmin, ActorController.getAllActor);
 
 router.post("/", ActorController.createActor);
 

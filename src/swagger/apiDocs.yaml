@@ -16,6 +16,16 @@ tags:
 
 servers: []
 
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
 paths:
   # API Auth
   /api/auth/login:
@@ -142,6 +152,30 @@ paths:
             application/json:
               schema:
                 type: object
+
+  /api/auth/refreshToken:
+    post:
+      summary: Register
+      tags:
+        - auth
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              poperties:
+                refreshToken:
+                  type: String
+              required:
+                - refreshToken
+              example: { "refreshToken": "string" }
+      responses:
+        "201":
+          description: Create new token successfully!!!
+        "400":
+          description: Failed!!!
   #API Users====================================================
   /api/users:
     get:
@@ -182,6 +216,8 @@ paths:
       summary: Get all actors
       tags:
         - actors
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: List of all actors
@@ -377,7 +413,7 @@ paths:
           description: Book media id don't exits
         "400":
           description: Bad resquest in data
-#API uploadImage for book
+  #API uploadImage for book
   /api/uploadImg:
     post:
       summary: Upload book images to Cloudinary
@@ -432,7 +468,7 @@ paths:
 
     post:
       summary: Create a new book
-      tags: 
+      tags:
         - books
       description: Create a new book with image URLs from Cloudinary.
       requestBody:
@@ -550,57 +586,5 @@ paths:
             application/json:
               schema:
                 type: array
-# components:
-#   schemas:
-#     Actor:
-#       type: object
-#       properties:
-#         id:
-#           type: string
-#           example: "12345"
-#         name:
-#           type: string
-#           example: "Leonardo DiCaprio"
-#         age:
-#           type: integer
-#           example: 47
-#         movies:
-#           type: array
-#           items:
-#             type: string
-#           example: ["Titanic", "Inception"]
 
-#     BookMedia:
-#       type: object
-#       properties:
-#         id:
-#           type: string
-#           example: "67890"
-#         title:
-#           type: string
-#           example: "Harry Potter and the Sorcerer's Stone"
-#         author:
-#           type: string
-#           example: "J.K. Rowling"
-#         format:
-#           type: string
-#           example: "eBook"
-#         url:
-#           type: string
-#           example: "https://example.com/harrypotter"
 
-#     Book:
-#       type: object
-#       properties:
-#         id:
-#           type: string
-#           example: "45678"
-#         title:
-#           type: string
-#           example: "The Great Gatsby"
-#         author:
-#           type: string
-#           example: "F. Scott Fitzgerald"
-#         genre:
-#           type: string
-#           example: "Classic"

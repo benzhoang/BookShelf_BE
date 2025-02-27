@@ -1,7 +1,10 @@
 const express = require("express");
 const passport = require("passport");
 const AuthController = require("../controllers/auth.controller");
-const { authenticate, authorizeAdmin } = require("../middlewares/auth.middleware");
+const {
+  authenticate,
+  authorizeAdmin,
+} = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
@@ -28,13 +31,14 @@ router.get(
   AuthController.googleAuthCallback
 );
 
-
-
 // 🔑 Standard Login
 router.post("/login", AuthController.Login);
 
 // 🔑 Register
 router.post("/register", AuthController.Register);
+
+// RefreshToken
+router.post("/refreshToken", AuthController.refreshToken);
 
 // 🚪 Logout
 router.post("/logout", authenticate, AuthController.Logout);

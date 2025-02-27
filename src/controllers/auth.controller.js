@@ -90,6 +90,42 @@ exports.Login = async (req, res) => {
   }
 };
 
+exports.refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(401).json({ message: "Refresh Token is required" });
+    }
+
+    // Verify the refresh token
+    jwt.verify(refreshToken, secretKey, async (err, decoded) => {
+      if (err) {
+        return res.status(403).json({ message: "Invalid refresh token" });
+      }
+
+      // Find the user associated with this refresh token
+      const user = await User.findOne({ refreshToken });
+
+      if (!user) {
+        return res.status(403).json({ message: "Invalid refresh token" });
+      }
+
+      // Generate a new access token
+      const newAccessToken = jwt.sign(
+        { id: user._id, role: user.role },
+        secretKey,
+        { expiresIn: "15m" } // 15-minute access token
+      );
+
+      res.status(200).json({ accessToken: newAccessToken });
+    });
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 exports.getMe = async (req, res) => {
   try {
     res.status(200).json(req.user);
