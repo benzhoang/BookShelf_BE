@@ -16,6 +16,20 @@ const SERVER_URL =
     ? process.env.SERVER_URL_PROD
     : `http://localhost:${PORT}`;
 
+
+// CORS Configuration
+app.use(
+  cors(
+    {
+      origin: "http://localhost:3000",
+      methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+      credentials: true,
+    }
+  )
+);
+
+app.options("*", cors());
+
 // CONFIG MONGODB
 const db = require("./configs/db.config");
 db.connect();
@@ -73,16 +87,6 @@ app.get("/", (req, res) => {
   res.status(200).json({ message: "Welcome to Back-end project!!!" });
 });
 
-// CORS Configuration
-app.use(
-  cors(
-    {
-      origin: "http://localhost:3000",
-      methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-      credentials: true,
-    }
-  )
-);
 
 app.listen(PORT, () => {
   console.log(`Server running on ${SERVER_URL}`);
