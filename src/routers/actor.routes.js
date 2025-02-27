@@ -5,17 +5,19 @@ const ActorController = require("../controllers/actor.controller");
 const {
   authenticate,
   authorizeAdmin,
+  authorizeCustomer,
+  authorizeManager,
   authorizeStaff,
 } = require("../middlewares/auth.middleware");
 
-router.get("/", authenticate, authorizeAdmin, ActorController.getAllActor);
+router.get("/", authenticate, ActorController.getAllActor);
 
-router.post("/", ActorController.createActor);
+router.post("/", authorizeAdmin, ActorController.createActor);
 
-router.get("/:id", ActorController.getActorById);
+router.get("/:id", authenticate, ActorController.getActorById);
 
-router.put("/:id", ActorController.updateActor);
+router.put("/:id", authorizeAdmin, ActorController.updateActor);
 
-router.delete("/:id", ActorController.deleteActor);
+router.delete("/:id", authorizeAdmin, ActorController.deleteActor);
 
 module.exports = router;
