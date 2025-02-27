@@ -30,9 +30,22 @@ exports.createBookMedia = async (req, res) => {
     });
     await newBookMedia.save();
     res.status(201).json({
-      message: "Create book media succesfully",
+      message: "Create book media successfully",
       bookMedia: newBookMedia,
     });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+exports.deleteBookMedia = async (req, res) => {
+ try {
+    const book = await BookMedia.findByIdAndDelete(req.params.id);
+    if (!book) {
+      return res.status(404).json({ message: "Book media not found!!!" });
+    } else {
+      res.status(200).json({ message: "Delete book media successfully!!!" });
+    }
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

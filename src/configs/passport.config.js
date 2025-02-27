@@ -39,13 +39,13 @@ passport.use(
         let user = await User.findOne({ email });
 
         if (!user) {
-          const validRoles = ["Admin", "User", "Staff"];
+          const validRoles = ["Admin", "Manager", "Customer", "Staff"];
           const requestedRole =
             req.query.state?.charAt(0).toUpperCase() +
             req.query.state?.slice(1);
           const role = validRoles.includes(requestedRole)
             ? requestedRole
-            : "User";
+            : "Customer";
 
           user = await User.create({
             userName: profile.displayName,
