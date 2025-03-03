@@ -12,7 +12,7 @@ const {
 
 router.get("/", BookMediaController.getAllBookMedia);
 router.get("/:id", BookMediaController.getBookMediaById);
-router.post("/", authorizeAdmin, BookMediaController.createBookMedia);
-router.post("/", authorizeAdmin, BookMediaController.deleteBookMedia);
+router.post("/", authenticate, authorizeAdmin, BookMediaController.createBookMedia);
+router.post("/",authenticate, authorizeAdmin, BookMediaController.deleteBookMedia);
 
 module.exports = router;

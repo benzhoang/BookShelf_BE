@@ -11,9 +11,9 @@ const {
 } = require("../middlewares/auth.middleware");
 
 router.get("/", authenticate, authorizeAdmin, InvoiceController.getAllInvoice);
-router.post("/", authorizeCustomer, InvoiceController.createInvoice);
+router.post("/",authenticate, authorizeCustomer, InvoiceController.createInvoice);
 router.get("/:id", InvoiceController.getInvoiceById);
-router.delete("/:id", authorizeAdmin, InvoiceController.deleteInvoice);
+router.delete("/:id",authenticate, authorizeAdmin, InvoiceController.deleteInvoice);
 
 
 module.exports = router;

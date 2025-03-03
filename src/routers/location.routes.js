@@ -11,9 +11,9 @@ const {
 } = require("../middlewares/auth.middleware");
 
 router.get("/", LocationController.getAllLocation);
-router.post("/", authorizeAdmin, LocationController.createLocation);
+router.post("/",authenticate, authorizeAdmin, LocationController.createLocation);
 router.get("/:id", LocationController.getLocationById);
-router.delete("/:id", authorizeAdmin, LocationController.deleteLocation);
+router.delete("/:id",authenticate, authorizeAdmin, LocationController.deleteLocation);
 
 
 module.exports = router;

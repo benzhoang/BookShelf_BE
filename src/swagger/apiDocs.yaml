@@ -15,7 +15,8 @@ tags:
   - name: bookmedias
   - name: uploadImg
 
-servers: []
+servers: 
+ - url: http://localhost:3000
 
 security:
   - bearerAuth: []
@@ -41,7 +42,7 @@ paths:
           application/json:
             schema:
               type: object
-              poperties:
+              properties:
                 email:
                   type: String
                 password:
@@ -65,7 +66,7 @@ paths:
           application/json:
             schema:
               type: object
-              poperties:
+              properties:
                 userName:
                   type: String
                 email:
@@ -91,68 +92,37 @@ paths:
           description: Register successfully!!!
         "400":
           description: Register Failed!!!
+
+          # Google******************************************
   /api/auth/login/google:
-    post:
+    get:
       summary: login with google
-      deprecated: false
       description: ""
       tags:
         - auth
-      parameters:
-        - name: role
-          in: query
-          description: ""
-          required: true
-          example: saa
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                password:
-                  type: string
-              required:
-                - email
-                - password
-            example:
-              email: Agustin_Ward@hotmail.com
-              password: "1234567890"
       responses:
-        "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-          headers: {}
+        "302":
+          description: "Redirect to Google authentication!!!"
 
-  /api/auth/getMe:
+  /api/auth/login/google/callback:
     get:
-      summary: Get profile
+      summary: "Google OAuth callback"
+      description: "Handles authentication response from Google."
       tags:
         - auth
-      security:
-        - bearerAuth: []
       parameters:
-        - in: header
-          name: Authorization
+        - in: query
+          name: state
           schema:
             type: string
-          required: true
-          description: Bearer token
+          description: "State parameter to maintain user session."
       responses:
         "200":
-          description: Profile user
-          content:
-            application/json:
-              schema:
-                type: object
+          description: "Successfully authenticated with Google."
+        "400":
+          description: "Login failed."
+        "500":
+          description: "Server error during authentication."
 
   /api/auth/refreshToken:
     post:
@@ -166,7 +136,7 @@ paths:
           application/json:
             schema:
               type: object
-              poperties:
+              properties:
                 refreshToken:
                   type: String
               required:
@@ -177,6 +147,7 @@ paths:
           description: Create new token successfully!!!
         "400":
           description: Failed!!!
+
   #API Users====================================================
   /api/users:
     get:
@@ -190,6 +161,27 @@ paths:
             application/json:
               schema:
                 type: object
+
+  /api/users/profile:
+    get:
+      summary: Get profile
+      tags:
+        - users
+      # parameters:
+      #   - in: header
+      #     name: Authorization
+      #     schema:
+      #       type: string
+      #     required: true
+      #     description: Bearer token
+      responses:
+        "200":
+          description: Profile user
+          content:
+            application/json:
+              schema:
+                type: object
+
   /api/users/{id}:
     get:
       summary: Get an users by ID
@@ -609,7 +601,6 @@ paths:
         "500":
           description: Internal server error
 
-
   /api/categories/{id}:
     get:
       summary: Get an category by ID
@@ -631,7 +622,7 @@ paths:
               properties: {}
         "404":
           description: Category not found
-          
+
     delete:
       summary: Delete an category by ID
       tags:
@@ -738,7 +729,7 @@ paths:
         "400":
           description: Bad resquest in data
 
-#API Invoices============================================
+  #API Invoices============================================
   /api/invoices:
     get:
       summary: Get all invoices
