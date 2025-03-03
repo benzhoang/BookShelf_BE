@@ -2,6 +2,7 @@ const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const { authenticate, secretKey } = require("../middlewares/auth.middleware");
 const { token } = require("morgan");
+const bcrypt = require('bcrypt')
 
 exports.googleAuthCallback = async (req, res) => {
   if (!req.user) {
@@ -38,7 +39,7 @@ exports.googleAuthCallback = async (req, res) => {
   }
 };
 
-exports.Register = async (req, res) => {
+exports.Register = async (req, res, next) => {
   try {
     const { userName, email, password, role } = req.body;
 
@@ -55,8 +56,15 @@ exports.Register = async (req, res) => {
       role,
     });
 
-    await newUser.save();
-    res.status(201).json({ message: "Register successfully", user: newUser });
+    bcrypt.hash(newUser.password, 10, async function (err, hash) {
+      if (err) throw err;
+      newUser.password = hash
+      await newUser.save()
+        .then((user) => {
+          res.status(201).json({ message: "Register successfully", user: user });
+        })
+        .catch(next);
+    });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -66,9 +74,11 @@ exports.Login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email, password });
+    const user = await User.findOne({ email });
 
-    if (!user) {
+    const matchPassword = await bcrypt.compare(password, user.password)
+
+    if (!user && !matchPassword) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
