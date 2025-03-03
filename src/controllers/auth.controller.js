@@ -29,6 +29,7 @@ exports.googleAuthCallback = async (req, res) => {
     // Save refresh token in the database
     await User.findByIdAndUpdate(req.user._id, {
       $push: { refreshToken: refreshToken },
+      $set: { accessToken: [accessToken] }
     });
 
     // Return both tokens
