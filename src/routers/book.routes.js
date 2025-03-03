@@ -11,9 +11,9 @@ const {
   } = require("../middlewares/auth.middleware");
 
 router.get("/", BookController.getAllBooks);
-router.post("/", authorizeAdmin, BookController.createBook);
+router.post("/", authenticate, authorizeAdmin, BookController.createBook);
 router.get("/:id", BookController.getBookById);
-router.delete("/:id", authorizeAdmin, BookController.deleteBook);
+router.delete("/:id",authenticate, authorizeAdmin, BookController.deleteBook);
 
 
 module.exports = router;

@@ -8,12 +8,12 @@ const {
 
 const router = express.Router();
 
-// 🌐 Google OAuth Login
+// Google OAuth Login
 router.get(
   "/login/google",
   passport.authenticate("google", {
     scope: ["profile", "email"],
-    state: "Customer", // Ensures a default role
+    state: "Customer", 
   })
 );
 
@@ -43,8 +43,6 @@ router.post("/refreshToken", AuthController.refreshToken);
 // 🚪 Logout
 router.post("/logout", authenticate, AuthController.Logout);
 
-// 👤 Get current user
-router.get("/getMe", authenticate, AuthController.getMe);
 
 // 🔒 Protected Routes
 router.get("/admin/dashboard", authenticate, authorizeAdmin, (req, res) => {

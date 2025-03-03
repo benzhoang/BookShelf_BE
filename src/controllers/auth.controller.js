@@ -72,16 +72,16 @@ exports.Login = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    const accessToken = jwt.sign({ sub: user._id, role: user.role }, secretKey, {
-      expiresIn: "1d",
+    const accessToken = jwt.sign({ id: user._id, role: user.role }, secretKey, {
+      expiresIn: "1h",
     });
-    const refreshToken = jwt.sign({ sub: user._id, role: user.role }, secretKey, {
+    const refreshToken = jwt.sign({ id: user._id, role: user.role }, secretKey, {
       expiresIn: "7d",
     });
 
     // user.refreshToken.push(refreshToken);
     user.refreshToken = refreshToken;
-    user.accessToken = accessToken;
+    // user.accessToken = accessToken;
     await user.save();
 
     res.status(200).json({ accessToken, refreshToken });
@@ -126,13 +126,6 @@ exports.refreshToken = async (req, res) => {
   }
 };
 
-exports.getMe = async (req, res) => {
-  try {
-    res.status(200).json(req.user);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
 
 exports.Logout = async (req, res) => {
   try {

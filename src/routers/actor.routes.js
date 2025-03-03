@@ -10,14 +10,14 @@ const {
   authorizeStaff,
 } = require("../middlewares/auth.middleware");
 
-router.get("/", authenticate, ActorController.getAllActor);
+router.get("/", ActorController.getAllActor);
 
-router.post("/", authorizeAdmin, ActorController.createActor);
+router.post("/", authenticate, authorizeAdmin, ActorController.createActor);
 
 router.get("/:id", authenticate, ActorController.getActorById);
 
-router.put("/:id", authorizeAdmin, ActorController.updateActor);
+router.put("/:id", authenticate, authorizeAdmin, ActorController.updateActor);
 
-router.delete("/:id", authorizeAdmin, ActorController.deleteActor);
+router.delete("/:id", authenticate, authorizeAdmin, ActorController.deleteActor);
 
 module.exports = router;

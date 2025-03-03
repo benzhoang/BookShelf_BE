@@ -11,8 +11,8 @@ const {
 } = require("../middlewares/auth.middleware");
 
 router.get("/", CategoryController.getAllCategory);
-router.post("/", authorizeAdmin, CategoryController.createCategory);
+router.post("/",authenticate, authorizeAdmin, CategoryController.createCategory);
 router.get("/:id", CategoryController.getCategoryById);
-router.delete("/:id", authorizeAdmin, CategoryController.deleteCategory);
+router.delete("/:id",authenticate, authorizeAdmin, CategoryController.deleteCategory);
 
 module.exports = router;

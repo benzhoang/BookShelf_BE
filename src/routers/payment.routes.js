@@ -11,8 +11,8 @@ const {
 } = require("../middlewares/auth.middleware");
 
 router.get("/", PaymentController.getAllPayment);
-router.post("/", authorizeAdmin, PaymentController.createPayment);
+router.post("/",authenticate, authorizeAdmin, PaymentController.createPayment);
 router.get("/:id", PaymentController.getPaymentById);
-router.delete("/:id", authorizeAdmin, PaymentController.deletePayment);
+router.delete("/:id",authenticate, authorizeAdmin, PaymentController.deletePayment);
 
 module.exports = router;
