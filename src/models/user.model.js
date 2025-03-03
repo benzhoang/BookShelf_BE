@@ -6,7 +6,8 @@ const UserSchema = new Schema(
   {
     userName: { type: String, required: true },
     email: { type: String, required: true },
-    password: { type: String, required: true },
+    password: { type: String, required: function () { return !this.googleId; } },
+    googleId: { type: String },
     role: { type: String, enum: ["Admin", "Manager", "Customer", "Staff"], default: "Customer" },
     accessToken: [{ type: String }],
     refreshToken: [{ type: String }],
