@@ -6,7 +6,40 @@ const upload = require("../configs/upload.config");
 
 exports.getAllBooks = async (req, res) => {
   try {
-    const books = await Book.find().populate([
+    const { categoryName, origin, actorName } = req.query;
+
+    // Build a query object
+    let query = {};
+
+    if (categoryName) {
+      const category = await Category.findOne({ categoryName });
+      console.log(category);
+      if (category) {
+        query.categoryID = category._id;
+      } else {
+        return res.status(404).json({ message: "Category not found" });
+      }
+    }
+
+    if (origin) {
+      const bookMedia = await BookMedia.findOne({ origin });
+      if (bookMedia) {
+        query.bookMediaID = bookMedia._id;
+      } else {
+        return res.status(404).json({ message: "Book media not found" });
+      }
+    }
+
+    if (actorName) {
+      const actor = await Actor.findOne({ actorName });
+      if (actor) {
+        query.actorID = actor._id;
+      } else {
+        return res.status(404).json({ message: "Actor not found" });
+      }
+    }
+
+    const books = await Book.find(query).populate([
       { path: "categoryID" },
       { path: "bookMediaID" },
       { path: "actorID" },
