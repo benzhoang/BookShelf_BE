@@ -6,7 +6,40 @@ const upload = require("../configs/upload.config");
 
 exports.getAllBooks = async (req, res) => {
   try {
-    const books = await Book.find().populate([
+    const { categoryName, origin, actorName } = req.query;
+
+    // Build a query object
+    let query = {};
+
+    if (categoryName) {
+      const category = await Category.findOne({ categoryName });
+      console.log(category);
+      if (category) {
+        query.categoryID = category._id;
+      } else {
+        return res.status(404).json({ message: "Category not found" });
+      }
+    }
+
+    if (origin) {
+      const bookMedia = await BookMedia.findOne({ origin });
+      if (bookMedia) {
+        query.bookMediaID = bookMedia._id;
+      } else {
+        return res.status(404).json({ message: "Book media not found" });
+      }
+    }
+
+    if (actorName) {
+      const actor = await Actor.findOne({ actorName });
+      if (actor) {
+        query.actorID = actor._id;
+      } else {
+        return res.status(404).json({ message: "Actor not found" });
+      }
+    }
+
+    const books = await Book.find({ query }).populate([
       { path: "categoryID" },
       { path: "bookMediaID" },
       { path: "actorID" },
@@ -20,19 +53,31 @@ exports.getAllBooks = async (req, res) => {
 
 exports.createBook = async (req, res) => {
   try {
-    const { bookName, description, price, categoryName, actorName, origin, imageUrls } = req.body;
+    const {
+      bookName,
+      description,
+      price,
+      categoryName,
+      actorName,
+      origin,
+      imageUrls,
+    } = req.body;
+    const user = req.user._id;
 
     if (!categoryName || !actorName || !origin) {
-      return res.status(400).json({ message: "Category, actor, and origin are required!" });
+      return res
+        .status(400)
+        .json({ message: "Category, actor, and origin are required!" });
     }
 
-    const category = await Category.findOne({ categoryName: categoryName });
-    const actor = await Actor.findOne({ actorName: actorName });
+    const category = await Category.findOne({ categoryName });
+    const actor = await Category.findOne({ actorName });
     const bookMedia = await BookMedia.findOne({ origin });
 
-    if (!category) return res.status(404).json({ message: "Category not found!" });
-    if (!actor) return res.status(404).json({ message: "Actor not found!" });
-    if (!bookMedia) return res.status(404).json({ message: "Book media not found!" });
+    if (!category)
+      return res.status(404).json({ message: "Category not found!" });
+    if (!bookMedia)
+      return res.status(404).json({ message: "Book media not found!" });
 
     const newBook = new Book({
       bookName,
@@ -45,10 +90,14 @@ exports.createBook = async (req, res) => {
     });
 
     await newBook.save();
-    res.status(201).json({ message: "Book created successfully!", book: newBook });
+    res
+      .status(201)
+      .json({ message: "Book created successfully!", book: newBook });
   } catch (error) {
     console.error("Error creating book:", error);
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
@@ -72,6 +121,7 @@ exports.getBookById = async (req, res) => {
       { path: "bookMediaID" },
       { path: "actorID" },
     ]);
+
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
     } else {

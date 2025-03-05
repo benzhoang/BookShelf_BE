@@ -9,20 +9,27 @@ const {
 const router = express.Router();
 
 // Google OAuth Login
+
 router.get(
   "/login/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-    state: "Customer", 
-  })
+  (req, res, next) => {
+    // Ensure the state is correctly formatted
+    const state = encodeURIComponent(req.query.redirect || "Customer");
+    passport.authenticate("google", {
+      scope: ["profile", "email"],
+      state,
+    })(req, res, next);
+  }
 );
 
+// Google Callback Route
 router.get(
   "/login/google/callback",
   (req, res, next) => {
     passport.authenticate("google", { session: false }, (err, user) => {
       if (err || !user) {
-        return res.redirect(req.query.state?.split(",")[1]);
+        const redirectUrl = decodeURIComponent(req.query.state || "/");
+        return res.redirect(redirectUrl); // Redirect to provided URL on failure
       }
       req.user = user;
       next();
@@ -30,6 +37,28 @@ router.get(
   },
   AuthController.googleAuthCallback
 );
+
+// router.get(
+//   "/login/google",
+//   passport.authenticate("google", {
+//     scope: ["profile", "email"],
+//     state: "Customer", 
+//   })
+// );
+
+// router.get(
+//   "/login/google/callback",
+//   (req, res, next) => {
+//     passport.authenticate("google", { session: false }, (err, user) => {
+//       if (err || !user) {
+//         return res.redirect(req.query.state?.split(",")[1]);
+//       }
+//       req.user = user;
+//       next();
+//     })(req, res, next);
+//   },
+//   AuthController.googleAuthCallback
+// );
 
 // 🔑 Standard Login
 router.post("/login", AuthController.Login);

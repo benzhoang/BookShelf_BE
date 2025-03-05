@@ -16,16 +16,13 @@ const SERVER_URL =
     ? process.env.SERVER_URL_PROD
     : `http://localhost:${PORT}`;
 
-
 // CORS Configuration
 app.use(
-  cors(
-    {
-      origin: "http://localhost:3000",
-      methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-      credentials: true,
-    }
-  )
+  cors({
+    origin: "http://localhost:3000",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+  })
 );
 
 app.options("*", cors());
@@ -86,7 +83,6 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Welcome to Back-end project!!!" });
 });
-
 
 app.listen(PORT, () => {
   console.log(`Server running on ${SERVER_URL}`);
