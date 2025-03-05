@@ -15,8 +15,8 @@ tags:
   - name: bookmedias
   - name: uploadImg
 
-servers: 
- - url: http://localhost:3000
+servers:
+  - url: http://localhost:3000
 
 security:
   - bearerAuth: []
@@ -445,7 +445,7 @@ paths:
         "400":
           description: Image upload failed
 
-  # API Books ===========================================================
+  # API Books ==================================================================================================================================
   /api/books:
     get:
       summary: Get all books
@@ -535,6 +535,43 @@ paths:
         "404":
           description: Books not found
 
+    put:
+      summary: Update a Book by ID
+      tags:
+        - books
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            properties:
+              actorName:
+                type: string
+            example:
+              {
+                "bookName": "",
+                "description": "",
+                "price": 56,
+                "categoryName": "",
+                "actorName": " ",
+                "origin": "",
+                "image": "",
+                "soldBook": 20,
+                "quantity": 30,
+              }
+      responses:
+        "200":
+          description: Book updated successfully
+        "404":
+          description: Book not found
+
     delete:
       summary: Delete an books by ID
       tags:
@@ -603,7 +640,7 @@ paths:
 
   /api/categories/{id}:
     get:
-      summary: Get an category by ID
+      summary: Get a category by ID
       tags:
         - categories
       parameters:
@@ -622,9 +659,37 @@ paths:
               properties: {}
         "404":
           description: Category not found
+    put:
+      summary: Update a category by ID
+      tags:
+        - categories
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            properties:
+              actorName:
+                type: string
+            example:
+              {
+                "categoryName": "",
+              }
+      responses:
+        "200":
+          description: Category updated successfully!!!
+        "404":
+          description: Category not found!!!
 
     delete:
-      summary: Delete an category by ID
+      summary: Delete a category by ID
       tags:
         - categories
       parameters:
