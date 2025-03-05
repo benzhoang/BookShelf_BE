@@ -50,6 +50,7 @@ passport.use(
           user = await User.create({
             userName: profile.displayName,
             email,
+            googleId: profile.id,
             isActive: true,
             role,
           });
