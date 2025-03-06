@@ -3,16 +3,32 @@ const router = express.Router();
 const CategoryController = require("../controllers/category.controller");
 
 const {
-    authenticate,
-    authorizeAdmin,
-    authorizeCustomer,
-    authorizeManager,
-    authorizeStaff,
+  authenticate,
+  authorizeAdmin,
+  authorizeCustomer,
+  authorizeManager,
+  authorizeStaff,
 } = require("../middlewares/auth.middleware");
 
 router.get("/", CategoryController.getAllCategory);
-router.post("/",authenticate, authorizeAdmin, CategoryController.createCategory);
+router.post(
+  "/",
+  authenticate,
+  authorizeAdmin,
+  CategoryController.createCategory
+);
 router.get("/:id", CategoryController.getCategoryById);
-router.delete("/:id",authenticate, authorizeAdmin, CategoryController.deleteCategory);
+router.delete(
+  "/:id",
+  authenticate,
+  authorizeAdmin,
+  CategoryController.deleteCategory
+);
+router.put(
+  "/:id",
+  authenticate,
+  authorizeAdmin,
+  CategoryController.updateCategory
+);
 
 module.exports = router;

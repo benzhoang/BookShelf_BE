@@ -39,7 +39,7 @@ exports.getAllBooks = async (req, res) => {
       }
     }
 
-    const books = await Book.find(query).populate([
+    const books = await Book.find({ query }).populate([
       { path: "categoryID" },
       { path: "bookMediaID" },
       { path: "actorID" },
@@ -53,19 +53,42 @@ exports.getAllBooks = async (req, res) => {
 
 exports.createBook = async (req, res) => {
   try {
-    const { bookName, description, price, categoryName, actorName, origin, imageUrls } = req.body;
+    const {
+      bookName,
+      description,
+      price,
+      categoryName,
+      actorName,
+      origin,
+      imageUrls,
+    } = req.body;
+    const user = req.user._id;
 
     if (!categoryName || !actorName || !origin) {
-      return res.status(400).json({ message: "Category, actor, and origin are required!" });
+      return res
+        .status(400)
+        .json({ message: "Category, actor, and origin are required!" });
     }
 
-    const category = await Category.findOne({ categoryName: categoryName });
-    const actor = await Actor.findOne({ actorName: actorName });
+    const category = await Category.findOne({ categoryName });
+
     const bookMedia = await BookMedia.findOne({ origin });
 
-    if (!category) return res.status(404).json({ message: "Category not found!" });
-    if (!actor) return res.status(404).json({ message: "Actor not found!" });
-    if (!bookMedia) return res.status(404).json({ message: "Book media not found!" });
+    const bookNameExits = await Book.findOne({ bookName });
+
+    let actor = await Actor.findOne({ actorName });
+    if (!actor) {
+      actor = new Actor({ actorName });
+      await actor.save();
+    }
+
+    if (bookNameExits)
+      return res.status(404).json({ message: "Book name alredy exits" });
+
+    if (!category)
+      return res.status(404).json({ message: "Category not found!" });
+    if (!bookMedia)
+      return res.status(404).json({ message: "Book media not found!" });
 
     const newBook = new Book({
       bookName,
@@ -78,10 +101,14 @@ exports.createBook = async (req, res) => {
     });
 
     await newBook.save();
-    res.status(201).json({ message: "Book created successfully!", book: newBook });
+    res
+      .status(201)
+      .json({ message: "Book created successfully!", book: newBook });
   } catch (error) {
     console.error("Error creating book:", error);
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
@@ -105,6 +132,7 @@ exports.getBookById = async (req, res) => {
       { path: "bookMediaID" },
       { path: "actorID" },
     ]);
+
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
     } else {
@@ -112,6 +140,63 @@ exports.getBookById = async (req, res) => {
     }
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+exports.updateBook = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      bookName,
+      description,
+      price,
+      categoryName,
+      actorName,
+      origin,
+      image,
+      soldBook,
+      quantity,
+    } = req.body;
+
+    const book = await Book.findById(id);
+    if (!book) return res.status(404).json({ message: "Book id not found!!!" });
+
+    const category = await Category.findOne({ categoryName });
+    const bookMedia = await BookMedia.findOne({ origin });
+    const bookNameExits = await Book.findOne({ bookName });
+
+    if (bookNameExits)
+      return res.status(404).json({ message: "Book name already exits!!!" });
+
+    if (!category)
+      return res.status(404).json({ message: "Category not found!" });
+    if (!bookMedia)
+      return res.status(404).json({ message: "Book media not found!" });
+
+    // Find or create actor
+    let actor = await Actor.findOne({ actorName });
+    if (!actor) {
+      actor = new Actor({ actorName });
+      await actor.save();
+    }
+
+    // Update book details
+    book.bookName = bookName || book.bookName;
+    book.description = description || book.description;
+    book.price = price || book.price;
+    book.image = image || book.image;
+    book.categoryID = category._id;
+    book.actorID = actor._id;
+    book.bookMediaID = bookMedia._id;
+    book.soldBook = soldBook || book.soldBook;
+    book.quantity = quantity || book.quantity;
+
+    await book.save();
+    res.status(200).json({ message: "Book updated successfully!", book });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
