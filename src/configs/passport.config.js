@@ -5,7 +5,7 @@ const User = require("../models/user.model");
 const { secretKey } = require("../middlewares/auth.middleware");
 require("dotenv").config();
 
-// 🔐 JWT Strategy
+// JWT Strategy
 passport.use(
   new JwtStrategy(
     {
@@ -24,7 +24,7 @@ passport.use(
   )
 );
 
-// 🔗 Google OAuth Strategy
+// Google OAuth Strategy
 passport.use(
   new GoogleStrategy(
     {

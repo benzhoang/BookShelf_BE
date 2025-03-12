@@ -4,16 +4,61 @@ const Actor = require("../models/actor.model");
 const BookMedia = require("../models/bookMedia.model");
 const upload = require("../configs/upload.config");
 
+// exports.getAllBooks = async (req, res) => {
+//   try {
+//     const { categoryName, origin, actorName } = req.query;
+
+//     // Build a query object
+//     let query = {};
+
+//     if (categoryName) {
+//       const category = await Category.findOne({ categoryName });
+//       console.log(category);
+//       if (category) {
+//         query.categoryID = category._id;
+//       } else {
+//         return res.status(404).json({ message: "Category not found" });
+//       }
+//     }
+
+//     if (origin) {
+//       const bookMedia = await BookMedia.findOne({ origin });
+//       if (bookMedia) {
+//         query.bookMediaID = bookMedia._id;
+//       } else {
+//         return res.status(404).json({ message: "Book media not found" });
+//       }
+//     }
+
+//     if (actorName) {
+//       const actor = await Actor.findOne({ actorName });
+//       if (actor) {
+//         query.actorID = actor._id;
+//       } else {
+//         return res.status(404).json({ message: "Actor not found" });
+//       }
+//     }
+
+//     const books = await Book.find(query).populate([
+//       { path: "categoryID" },
+//       { path: "bookMediaID" },
+//       { path: "actorID" },
+//     ]);
+
+//     res.status(200).json(books);
+//   } catch (error) {
+//     res.status(400).json({ message: error.message });
+//   }
+// };
+
 exports.getAllBooks = async (req, res) => {
   try {
     const { categoryName, origin, actorName } = req.query;
 
-    // Build a query object
     let query = {};
 
     if (categoryName) {
       const category = await Category.findOne({ categoryName });
-      console.log(category);
       if (category) {
         query.categoryID = category._id;
       } else {
@@ -39,10 +84,47 @@ exports.getAllBooks = async (req, res) => {
       }
     }
 
-    const books = await Book.find({ query }).populate([
-      { path: "categoryID" },
-      { path: "bookMediaID" },
-      { path: "actorID" },
+    const books = await Book.aggregate([
+      { $match: query }, // Lọc sách theo điều kiện
+      {
+        $lookup: {
+          from: "InvoiceDetails",
+          localField: "_id",
+          foreignField: "book",
+          as: "soldData"
+        }
+      },
+      {
+        $addFields: {
+          totalSold: { $sum: "$soldData.quantity" }, // Tính tổng số lượng đã bán
+          availableStock: { $subtract: ["$quantity", { $sum: "$soldData.quantity" }] } // Số lượng tồn kho
+        }
+      },
+      {
+        $lookup: { from: "categories", localField: "categoryID", foreignField: "_id", as: "category" }
+      },
+      {
+        $lookup: { from: "bookmedias", localField: "bookMediaID", foreignField: "_id", as: "bookMedia" }
+      },
+      {
+        $lookup: { from: "actors", localField: "actorID", foreignField: "_id", as: "actor" }
+      },
+      {
+        $project: {
+          _id: 1,
+          // title: 1,
+          bookName: 1,
+          image: 1,
+          description: 1,
+          price: 1,
+          category: { $arrayElemAt: ["$category.categoryName", 0] },
+          bookMedia: { $arrayElemAt: ["$bookMedia.origin", 0] },
+          actor: { $arrayElemAt: ["$actor.actorName", 0] },
+          quantity: 1,
+          totalSold: 1,
+          availableStock: 1
+        }
+      }
     ]);
 
     res.status(200).json(books);
@@ -50,6 +132,7 @@ exports.getAllBooks = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
 
 exports.createBook = async (req, res) => {
   try {
@@ -185,9 +268,9 @@ exports.updateBook = async (req, res) => {
     book.description = description || book.description;
     book.price = price || book.price;
     book.image = image || book.image;
-    book.categoryID = category._id;
-    book.actorID = actor._id;
-    book.bookMediaID = bookMedia._id;
+    book.category = category._id;
+    book.actor = actor._id;
+    book.bookMedia = bookMedia._id;
     book.soldBook = soldBook || book.soldBook;
     book.quantity = quantity || book.quantity;
 
