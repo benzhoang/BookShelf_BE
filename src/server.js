@@ -19,7 +19,7 @@ const SERVER_URL =
 // CORS Configuration
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: '*',
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })
