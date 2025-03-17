@@ -181,6 +181,7 @@ exports.createBook = async (req, res) => {
       categoryID: category._id,
       actorID: actor._id,
       bookMediaID: bookMedia._id,
+      quantity
     });
 
     await newBook.save();

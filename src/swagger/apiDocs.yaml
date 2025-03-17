@@ -482,11 +482,11 @@ paths:
                   type: string
                 origin:
                   type: string
+                quantity:
+                  type: number
                 imageUrls:
-                  type: array
-                  items:
-                    type: string
-                    example: "https://res.cloudinary.com/.../image.png"
+                  type: string
+                  example: "https://res.cloudinary.com/.../image.png"
               required:
                 - bookName
                 - description
