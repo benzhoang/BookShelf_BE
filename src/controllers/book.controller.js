@@ -143,6 +143,7 @@ exports.createBook = async (req, res) => {
       categoryName,
       actorName,
       origin,
+      quantity,
       imageUrls,
     } = req.body;
     const user = req.user._id;
