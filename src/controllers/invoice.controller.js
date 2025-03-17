@@ -1,4 +1,6 @@
 const Invoice = require("../models/invoice.model");
+const InvoiceDetails = require("../models/invoiceDetails.model");
+const Book = require("../models/book.model")
 
 exports.getAllInvoice = async (req, res) => {
   try {
@@ -31,16 +33,70 @@ exports.getInvoiceByUserId = async (req, res) => {
     }
   };
 
+// exports.createInvoice = async (req, res) => {
+//   try {
+//     const { userID, paymentID, totalPrice } = req.body;
+
+//     const newInvoice = new Invoice({
+//       userID,
+//       paymentID,
+//       totalPrice
+//     });
+//     await newInvoice.save();
+//     res.status(201).json({
+//       message: "Create new invoice successfully",
+//       invoice: newInvoice,
+//     });
+//   } catch (error) {
+//     res.status(400).json({ message: error.message });
+//   }
+// };
+
 exports.createInvoice = async (req, res) => {
   try {
-    const { userID, paymentID, totalPrice } = req.body;
+    const { userID, paymentID, totalPrice, items } = req.body; 
 
+    // Check quantity
+    for (const item of items) {
+      const book = await Book.findById(item.bookID);
+      if (!book) {
+        return res.status(404).json({ message: `Sách không tồn tại: ${item.bookID}` });
+      }
+      if (book.quantity === 0) {
+        return res.status(400).json({ message: `Sách "${book.bookName}" đã hết hàng` });
+      }
+      if (book.quantity < item.quantity) {
+        return res.status(400).json({ message: `Sách "${book.bookName}" chỉ còn ${book.quantity} cuốn` });
+      }
+    }
+
+    // Create invoice
     const newInvoice = new Invoice({
       userID,
       paymentID,
       totalPrice
     });
     await newInvoice.save();
+
+
+    const invoiceDetailsPromises = items.map(async (item) => {
+      const newInvoiceDetail = new InvoiceDetails({
+        invoiceID: newInvoice._id,
+        bookID: item.bookID,
+        quantity: item.quantity
+      });
+      await newInvoiceDetail.save();
+
+
+      await Book.findByIdAndUpdate(
+        item.bookID,
+        { $inc: { quantity: -item.quantity } }, 
+        { new: true }
+      );
+    });
+
+    await Promise.all(invoiceDetailsPromises);
+
     res.status(201).json({
       message: "Create new invoice successfully",
       invoice: newInvoice,
@@ -49,6 +105,7 @@ exports.createInvoice = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
 
 exports.deleteInvoice = async (req, res) => {
  try {
