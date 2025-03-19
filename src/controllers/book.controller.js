@@ -266,7 +266,7 @@ exports.getBookById = async (req, res) => {
 
 exports.updateBook = async (req, res) => {
   try {
-    const { id } = req.params
+    const { id } = req.params;
     const {
       bookName,
       description,
@@ -276,45 +276,62 @@ exports.updateBook = async (req, res) => {
       origin,
       image,
       quantity,
-    } = req.body
+    } = req.body;
 
-    const book = await Book.findById(id)
-    if (!book) return res.status(404).json({ message: "Book id not found!!!" })
+    const book = await Book.findById(id);
+    if (!book) return res.status(404).json({ message: "Book id not found!!!" });
 
-    const category = await Category.findOne({ categoryName })
-    const bookMedia = await BookMedia.findOne({ origin })
-    const bookNameExits = await Book.findOne({ bookName })
+    const category = await Category.findOne({ categoryName });
+    const bookMedia = await BookMedia.findOne({ origin });
+    const bookNameExits = await Book.findOne({ bookName });
 
-    if (!book._id.equals(bookNameExits._id))
-      return res.status(404).json({ message: "Book name already exits!!!" })
+    if (bookNameExits && !book._id.equals(bookNameExits._id))
+      return res.status(404).json({ message: "Book name already exists!!!" });
 
     if (!category)
-      return res.status(404).json({ message: "Category not found!" })
+      return res.status(404).json({ message: "Category not found!" });
     if (!bookMedia)
-      return res.status(404).json({ message: "Book media not found!" })
+      return res.status(404).json({ message: "Book media not found!" });
 
     // Find or create actor
-    let actor = await Actor.findOne({ actorName })
+    let actor = await Actor.findOne({ actorName });
     if (!actor) {
-      actor = new Actor({ actorName })
-      await actor.save()
+      actor = new Actor({ actorName });
+      await actor.save();
     }
 
-    // Update book details
-    book.bookName = bookName || book.bookName
-    book.description = description || book.description
-    book.price = price || book.price
-    book.image = image || book.image
-    book.category = category._id
-    book.actor = actor._id
-    book.bookMedia = bookMedia._id
-    book.quantity = quantity || book.quantity
+    // Kiểm tra nếu book chưa có QR hoặc bookName thay đổi
+    let shouldUpdateQR = !book.qrCode || (bookName && bookName !== book.bookName);
 
-    await book.save()
-    res.status(200).json({ message: "Book updated successfully!", book })
+    if (shouldUpdateQR) {
+      const qrData = JSON.stringify({ id: book._id, bookName: bookName || book.bookName });
+      const qrPath = path.join(__dirname, `../temp/${book._id}.png`);
+
+      await QRCode.toFile(qrPath, qrData);
+
+      const uploadResponse = await cloudinary.uploader.upload(qrPath, {
+        folder: "qrcodeOfBook",
+        public_id: `QR_${book._id}`,
+        overwrite: true,
+      });
+
+      fs.unlinkSync(qrPath);
+      book.qrCode = uploadResponse.secure_url;
+    }
+
+    // Cập nhật thông tin sách
+    book.bookName = bookName || book.bookName;
+    book.description = description || book.description;
+    book.price = price || book.price;
+    book.image = image || book.image;
+    book.category = category._id;
+    book.actor = actor._id;
+    book.bookMedia = bookMedia._id;
+    book.quantity = quantity || book.quantity;
+
+    await book.save();
+    res.status(200).json({ message: "Book updated successfully!", book });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message })
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
-}
+};
