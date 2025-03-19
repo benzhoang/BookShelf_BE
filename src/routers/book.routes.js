@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const BookController = require("../controllers/book.controller");
+const { uploadImage } = require("../middlewares/uploadImage.middlewares");
 
 const {
   authenticate,
@@ -11,7 +12,7 @@ const {
 } = require("../middlewares/auth.middleware");
 
 router.get("/", BookController.getAllBooks);
-router.post("/", authenticate, authorizeAdmin, BookController.createBook);
+router.post("/", authenticate, authorizeAdmin, uploadImage, BookController.createBook);
 router.get("/:id", BookController.getBookById);
 router.delete("/:id", authenticate, authorizeAdmin, BookController.deleteBook);
 

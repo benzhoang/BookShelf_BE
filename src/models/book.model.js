@@ -9,9 +9,9 @@ const BookSchema = new Schema({
     price: { type: Schema.Types.Decimal128, required: true },
     image: { type: String, required: true },
     quantity: { type: Number, required: true },
-    actorID: { type: Schema.ObjectId, ref: "Actor" },
-    categoryID: { type: Schema.ObjectId, ref: "Category" },
-    bookMediaID: { type: Schema.Types.ObjectId, ref: "BookMedia" },
+    actor: { type: Schema.ObjectId, ref: "Actor" },
+    category: { type: Schema.ObjectId, ref: "Category" },
+    bookMedia: { type: Schema.Types.ObjectId, ref: "BookMedia" },
     available: { type: Boolean, default: true }
 }, { versionKey: false, timestamps: true })
 

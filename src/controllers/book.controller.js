@@ -15,7 +15,7 @@ exports.getAllBooks = async (req, res) => {
       const category = await Category.findOne({ categoryName });
       console.log(category);
       if (category) {
-        query.categoryID = category._id;
+        query.category = category._id;
       } else {
         return res.status(404).json({ message: "Category not found" });
       }
@@ -38,13 +38,13 @@ exports.getAllBooks = async (req, res) => {
         return res.status(404).json({ message: "Actor not found" });
       }
     }
-
+    console.log(query);
     const books = await Book.find(query).populate([
-      { path: "categoryID" },
-      { path: "bookMediaID" },
-      { path: "actorID" },
+      { path: "category", select: 'categoryName' },
+      { path: "bookMedia", select: 'origin' },
+      { path: "actor", select: 'actorName' },
     ]);
-
+    console.log(books);
     res.status(200).json(books);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -136,64 +136,59 @@ exports.getAllBooks = async (req, res) => {
 
 exports.createBook = async (req, res) => {
   try {
-    const {
-      bookName,
-      description,
-      price,
-      categoryName,
-      actorName,
-      origin,
-      quantity,
-      imageUrls,
-    } = req.body;
+    if (!req.body) {
+      return res.status(400).json({ message: "Request body is missing" });
+    }
+
+    const { bookName, description, price, categoryName, actorName, origin, quantity } = req.body;
     const user = req.user._id;
 
     if (!categoryName || !actorName || !origin) {
-      return res
-        .status(400)
-        .json({ message: "Category, actor, and origin are required!" });
+      return res.status(400).json({ message: "Category, actor, and origin are required!" });
     }
 
-    const category = await Category.findOne({ categoryName });
+    if (!req.file) {
+      return res.status(400).json({ message: "Image is required" });
+    }
 
-    const bookMedia = await BookMedia.findOne({ origin });
+    // Lấy URL ảnh đã upload
+    const imageUrl = req.file.path;
 
-    const bookNameExits = await Book.findOne({ bookName });
+    // Tìm category, bookMedia, bookName song song để giảm thời gian truy vấn
+    const [category, bookMedia, bookNameExists] = await Promise.all([
+      Category.findOne({ categoryName }),
+      BookMedia.findOne({ origin }),
+      Book.findOne({ bookName }),
+    ]);
 
+    if (bookNameExists) return res.status(400).json({ message: "Book name already exists" });
+    if (!category) return res.status(404).json({ message: "Category not found!" });
+    if (!bookMedia) return res.status(404).json({ message: "Book media not found!" });
+
+    // Kiểm tra và tạo actor nếu chưa tồn tại
     let actor = await Actor.findOne({ actorName });
     if (!actor) {
       actor = new Actor({ actorName });
       await actor.save();
     }
 
-    if (bookNameExits)
-      return res.status(404).json({ message: "Book name alredy exits" });
-
-    if (!category)
-      return res.status(404).json({ message: "Category not found!" });
-    if (!bookMedia)
-      return res.status(404).json({ message: "Book media not found!" });
-
+    // Tạo sách mới
     const newBook = new Book({
       bookName,
       description,
       price,
-      image: imageUrls, // Lưu danh sách URL ảnh đã upload
-      categoryID: category._id,
-      actorID: actor._id,
-      bookMediaID: bookMedia._id,
-      quantity
+      image: imageUrl, // Lưu URL ảnh
+      category: category._id,
+      actor: actor._id,
+      bookMedia: bookMedia._id,
+      quantity,
     });
 
     await newBook.save();
-    res
-      .status(201)
-      .json({ message: "Book created successfully!", book: newBook });
+    res.status(201).json({ message: "Book created successfully!", book: newBook });
   } catch (error) {
     console.error("Error creating book:", error);
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
 
@@ -213,9 +208,9 @@ exports.deleteBook = async (req, res) => {
 exports.getBookById = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id).populate([
-      { path: "categoryID" },
-      { path: "bookMediaID" },
-      { path: "actorID" },
+      { path: "category", select: 'categoryName' },
+      { path: "bookMedia", select: 'origin' },
+      { path: "actor", select: 'actorName' },
     ]);
 
     if (!book) {
@@ -284,34 +279,3 @@ exports.updateBook = async (req, res) => {
       .json({ message: "Internal server error", error: error.message });
   }
 };
-
-// exports.uploadBook = async (req, res) => {
-//   try {
-//     const { bookId } = req.params; // Lấy ID sách từ URL
-
-//     if (!bookId) return res.status(400).json({ message: "Book ID is required!" });
-
-//     upload.single("image")(req, res, async (err) => {
-//       if (err) return res.status(400).json({ message: "Image upload failed", error: err.message });
-
-//       const imageUrl = req.file ? req.file.path : null;
-
-//       if (!imageUrl) return res.status(400).json({ message: "No image uploaded" });
-
-//       // Kiểm tra sách có tồn tại không
-//       const book = await Book.findById(bookId);
-//       if (!book) return res.status(404).json({ message: "Book not found!" });
-
-//       // Cập nhật sách với ảnh mới
-//       const updatedBook = await Book.findByIdAndUpdate(
-//         bookId,
-//         { $push: { image: imageUrl } }, // Thêm ảnh vào mảng `image`
-//         { new: true } // Trả về dữ liệu mới nhất
-//       );
-
-//       res.status(200).json({ message: "Image uploaded successfully!", book: updatedBook });
-//     });
-//   } catch (error) {
-//     res.status(500).json({ message: "Internal server error", error: error.message });
-//   }
-// };
