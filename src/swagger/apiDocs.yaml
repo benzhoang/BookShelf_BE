@@ -462,10 +462,39 @@ paths:
       summary: Create a new book
       tags:
         - books
-      description: Create a new book with image URLs from Cloudinary.
+      description: Create a new book with an uploaded image or an image URL.
       requestBody:
         required: true
         content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                bookName:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                categoryName:
+                  type: string
+                actorName:
+                  type: string
+                origin:
+                  type: string
+                quantity:
+                  type: number
+                image:
+                  type: string
+                  format: binary
+                  description: Upload an image file.
+              required:
+                - bookName
+                - description
+                - price
+                - categoryName
+                - actorName
+                - origin
           application/json:
             schema:
               type: object
@@ -484,7 +513,7 @@ paths:
                   type: string
                 quantity:
                   type: number
-                imageUrls:
+                imageUrl:
                   type: string
                   example: "https://res.cloudinary.com/.../image.png"
               required:

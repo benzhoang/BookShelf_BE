@@ -23,7 +23,7 @@ const upload = require("../configs/upload.config");
 
 const uploadImage = (req, res, next) => {
     upload.single("image")(req, res, (err) => {
-        if (err) {
+        if (err && err.code !== "LIMIT_UNEXPECTED_FILE") {
             return res.status(400).json({ message: "Image upload failed", error: err.message });
         }
         next();
