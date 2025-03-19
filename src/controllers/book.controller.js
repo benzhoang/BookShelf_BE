@@ -3,13 +3,24 @@ const Category = require("../models/category.model");
 const Actor = require("../models/actor.model");
 const BookMedia = require("../models/bookMedia.model");
 const upload = require("../configs/upload.config");
+const InvoiceDetail = require('../models/invoiceDetails.model')
 
 exports.getAllBooks = async (req, res) => {
   try {
-    const { categoryName, origin, actorName } = req.query;
+    const { bookName, categoryName, origin, actorName } = req.query;
 
     // Build a query object
     let query = {};
+
+    if (bookName) {
+      const book = await Book.findOne({ bookName });
+      console.log(book);
+      if (book) {
+        query._id = book._id;
+      } else {
+        return res.status(404).json({ message: "Book not found" });
+      }
+    }
 
     if (categoryName) {
       const category = await Category.findOne({ categoryName });
@@ -38,14 +49,25 @@ exports.getAllBooks = async (req, res) => {
         return res.status(404).json({ message: "Actor not found" });
       }
     }
-    console.log(query);
+
     const books = await Book.find(query).populate([
       { path: "category", select: 'categoryName' },
       { path: "bookMedia", select: 'origin' },
       { path: "actor", select: 'actorName' },
     ]);
-    console.log(books);
-    res.status(200).json(books);
+
+    const Books = await Promise.all(
+      books.map(async (book) => {
+        const invoiceDetails = await InvoiceDetail.find({ bookID: book._id });
+        const totalSold = invoiceDetails.reduce((sum, detail) => sum + detail.quantity, 0);
+        return {
+          ...book.toObject(),
+          soldQuantity: totalSold,
+        };
+      })
+    );
+
+    res.status(200).json(Books);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -233,7 +255,6 @@ exports.updateBook = async (req, res) => {
       actorName,
       origin,
       image,
-      soldBook,
       quantity,
     } = req.body;
 
@@ -244,7 +265,7 @@ exports.updateBook = async (req, res) => {
     const bookMedia = await BookMedia.findOne({ origin });
     const bookNameExits = await Book.findOne({ bookName });
 
-    if (bookNameExits)
+    if (!book._id.equals(bookNameExits._id))
       return res.status(404).json({ message: "Book name already exits!!!" });
 
     if (!category)
@@ -267,7 +288,6 @@ exports.updateBook = async (req, res) => {
     book.category = category._id;
     book.actor = actor._id;
     book.bookMedia = bookMedia._id;
-    book.soldBook = soldBook || book.soldBook;
     book.quantity = quantity || book.quantity;
 
     await book.save();
