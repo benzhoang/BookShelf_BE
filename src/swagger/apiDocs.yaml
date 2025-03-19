@@ -591,7 +591,6 @@ paths:
                 "actorName": " ",
                 "origin": "",
                 "image": "",
-                "soldBook": 20,
                 "quantity": 30,
               }
       responses:
