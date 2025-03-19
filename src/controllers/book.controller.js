@@ -140,32 +140,32 @@ exports.createBook = async (req, res) => {
       return res.status(400).json({ message: "Request body is missing" });
     }
 
-    const { bookName, description, price, categoryName, actorName, origin, quantity } = req.body;
+    const { bookName, description, price, categoryName, actorName, origin, quantity, imageUrl } = req.body;
     const user = req.user._id;
 
     if (!categoryName || !actorName || !origin) {
       return res.status(400).json({ message: "Category, actor, and origin are required!" });
     }
 
-    if (!req.file) {
-      return res.status(400).json({ message: "Image is required" });
+    // Xác định URL ảnh:
+    let finalImageUrl // Ảnh mặc định
+
+    if (req.file) {
+      finalImageUrl = req.file.path; // Nếu có file ảnh, lấy từ Cloudinary
+    } else if (imageUrl) {
+      finalImageUrl = imageUrl; // Nếu người dùng nhập URL ảnh, sử dụng URL đó
     }
 
-    // Lấy URL ảnh đã upload
-    const imageUrl = req.file.path;
-
-    // Tìm category, bookMedia, bookName song song để giảm thời gian truy vấn
-    const [category, bookMedia, bookNameExists] = await Promise.all([
-      Category.findOne({ categoryName }),
-      BookMedia.findOne({ origin }),
-      Book.findOne({ bookName }),
-    ]);
+    // Kiểm tra danh mục, phương tiện sách, và tên sách
+    const category = await Category.findOne({ categoryName })
+    const bookMedia = await BookMedia.findOne({ origin })
+    const bookNameExists = await Book.findOne({ bookName })
 
     if (bookNameExists) return res.status(400).json({ message: "Book name already exists" });
     if (!category) return res.status(404).json({ message: "Category not found!" });
     if (!bookMedia) return res.status(404).json({ message: "Book media not found!" });
 
-    // Kiểm tra và tạo actor nếu chưa tồn tại
+    // Kiểm tra và tạo diễn viên nếu chưa tồn tại
     let actor = await Actor.findOne({ actorName });
     if (!actor) {
       actor = new Actor({ actorName });
@@ -177,7 +177,7 @@ exports.createBook = async (req, res) => {
       bookName,
       description,
       price,
-      image: imageUrl, // Lưu URL ảnh
+      image: finalImageUrl, // Lưu URL ảnh (từ file upload hoặc từ URL nhập vào)
       category: category._id,
       actor: actor._id,
       bookMedia: bookMedia._id,
@@ -187,7 +187,6 @@ exports.createBook = async (req, res) => {
     await newBook.save();
     res.status(201).json({ message: "Book created successfully!", book: newBook });
   } catch (error) {
-    console.error("Error creating book:", error);
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
