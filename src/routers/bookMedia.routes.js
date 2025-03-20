@@ -14,6 +14,6 @@ router.get("/", BookMediaController.getAllBookMedia);
 router.post("/", authenticate, authorizeAdmin, BookMediaController.createBookMedia);
 router.get("/:id", BookMediaController.getBookMediaById);
 router.put("/:id", authenticate, authorizeAdmin, BookMediaController.updateBookMedia);
-router.post("/:id", authenticate, authorizeAdmin, BookMediaController.deleteBookMedia);
+router.delete("/:id", authenticate, authorizeAdmin, BookMediaController.deleteBookMedia);
 
 module.exports = router;
