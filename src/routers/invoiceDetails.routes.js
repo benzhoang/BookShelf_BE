@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const InvoiceController = require("../controllers/invoice.controller");
+const InvoiceDetailsController = require("../controllers/invoiceDetails.controller")
 
 const {
     authenticate,
@@ -10,10 +10,9 @@ const {
     authorizeStaff,
 } = require("../middlewares/auth.middleware");
 
-router.get("/", authenticate, authorizeAdmin, InvoiceController.getAllInvoice);
-router.post("/",authenticate, authorizeCustomer, InvoiceController.createInvoice);
-router.get("/:id", InvoiceController.getInvoiceById);
-router.delete("/:id",authenticate, authorizeAdmin, InvoiceController.deleteInvoice);
-
+router.get("/", authenticate, authorizeAdmin, InvoiceDetailsController.getAllInvoiceDetails);
+router.get("/:id", authenticate, authorizeAdmin, InvoiceDetailsController.getInvoiceDetailsById);
+router.post("/", authenticate, authorizeCustomer, InvoiceDetailsController.createInvoiceDetails);
+router.delete("/:id", authenticate, authorizeCustomer, InvoiceDetailsController.deleteInvoiceDetails);
 
 module.exports = router;
