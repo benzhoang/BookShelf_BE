@@ -57,20 +57,20 @@ exports.updateCategory = async (req, res) => {
 
     const category = await Category.findById(id);
     if (!category)
-      return res.status(404).json({ message: "Category not ffound!!!" });
+      return res.status(404).json({ message: "Category not found!!!" });
 
     let categoryNameExist = await Category.findOne({ categoryName });
-    if (!categoryNameExist) {
-      categoryNameExist = new Category({ categoryName });
-      await actor.save();
+    console.log(categoryNameExist);
+    if (categoryNameExist) {
+      if (categoryNameExist._id.equals(category._id)) {
+        return res.status(400).json({ message: 'Category is exits' })
+      }
     }
 
     category.categoryName = categoryName || category.categoryName;
     await category.save();
     res.status(200).json({ message: "Category updated successfully!", category });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
