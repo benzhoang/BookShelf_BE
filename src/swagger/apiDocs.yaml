@@ -11,6 +11,7 @@ tags:
   - name: books
   - name: categories
   - name: invoices
+  - name: invoiceDetails
   - name: bookmedias
   - name: uploadImg
 
@@ -756,16 +757,68 @@ paths:
             schema:
               type: object
               properties:
-                email:
-                  type: String
-                paymentMethod:
-                  type: String
+                userID:
+                  type: string
+                  description: ID of the user creating the invoice
+                paymentID:
+                  type: string
+                  description: ID of the payment method used
                 totalPrice:
-                  type: Number
+                  type: number
+                  description: Total price of the order
+                items:
+                  type: array
+                  description: List of purchased books
+                  items:
+                    type: object
+                    properties:
+                      bookID:
+                        type: string
+                        description: ID of the book
+                      quantity:
+                        type: integer
+                        description: Quantity of the book being purchased
+                      price:
+                        type: integer
+                        description: Price of the book
               required:
-                - email
-                - paymentMethod
+                - userID
+                - paymentID
                 - totalPrice
+                - items
+              example:
+                paymentID: "67a4845d7d4d9186133c9a52"
+                totalPrice: 78000
+                items:
+                  - bookID: "67ac87bcfeebb0ff7141cc20"
+                    quantity: 2
+                    price: 39000
+      responses:
+        201:
+          description: Invoice created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  invoice:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      userID:
+                        type: string
+                      paymentID:
+                        type: string
+                      totalPrice:
+                        type: number
+        400:
+          description: Bad request
+        404:
+          description: Book not found
+
       responses:
         "201":
           description: Invoice created successfully
@@ -823,3 +876,127 @@ paths:
           description: Invoice id don't exits
         "400":
           description: Bad resquest in data
+
+#API Invoices Details============================================
+  /api/invoicedetails:
+    get:
+      summary: Get all invoice details
+      tags:
+        - invoiceDetails
+      responses:
+        "200":
+          description: List of all invoice details
+          content:
+            application/json:
+              schema:
+                type: array
+
+    # post:
+    #   summary: Create a new invoice details
+    #   tags:
+    #     - invoiceDetails
+    #   description: Create a new invoice details.
+    #   requestBody:
+    #     required: true
+    #     content:
+    #       application/json:
+    #         schema:
+    #           type: object
+    #           properties:
+    #             invoiceID:
+    #               type: objectId
+    #             bookID:
+    #               type: onjectId
+    #             quantity:
+    #               type: Number
+    #             price:
+    #               type: Number
+    #           required:
+    #             - invoiceID
+    #             - bookID
+    #             - quantity
+    #             - price
+    #           example: { "invoiceID": "", bookID: "", quantity: 1, price: 100 }
+    #   responses:
+    #     "201":
+    #       description: invoice details created successfully
+    #       content:
+    #         application/json:
+    #           schema:
+    #             type: object
+    #             properties:
+    #               message:
+    #                 type: string
+    #                 example: "invoice details created successfully!"
+    #               book:
+    #                 type: object
+    #     "400":
+    #       description: Invalid input data
+    #     "500":
+    #       description: Internal server error
+
+  /api/invoicedetails/{id}:
+    get:
+      summary: Get an invoice details by ID
+      tags:
+        - invoiceDetails
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: onjectId  
+      responses:
+        "200":
+          description: Invoice details
+          content:
+            application/json:
+              schema:
+                type: object
+              properties: {}
+        "404":
+          description: invoice details not found
+
+    delete:
+      summary: Delete an invoice details by ID
+      tags:
+        - invoiceDetails
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Invoice deleted successfully
+        "404":
+          description: Invoice id don't exits
+        "400":
+          description: Bad resquest in data
+
+    put:
+      summary: Update an invoice details by ID
+      tags:
+        - invoiceDetails
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            properties:
+              quantity:
+                type: number
+            example: {  quantity: 1 }
+      responses:
+        "200":
+          description: invoice details updated successfully
+        "404":
+          description: invoice details not found

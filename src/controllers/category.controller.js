@@ -1,4 +1,5 @@
 const Category = require("../models/category.model");
+const Book = require("../models/book.model");
 
 exports.getAllCategory = async (req, res) => {
   try {
@@ -24,6 +25,12 @@ exports.createCategory = async (req, res) => {
   try {
     const { categoryName } = req.body;
 
+    if (!categoryName)
+      return res.status(400).json({ message: "Category is required!" });
+    const category = await Category.findOne({ categoryName });
+    if (category)
+      return res.status(404).json({ message: "Category name already exits!" });
+
     const newCategory = new Category({
       categoryName,
     });
@@ -39,7 +46,12 @@ exports.createCategory = async (req, res) => {
 
 exports.deleteCategory = async (req, res) => {
   try {
+    const categoryInBook = await Book.findOne({ category: req.params.id });
+    if (categoryInBook)
+      return res.status(400).json({ message: "Have category in Book!" });
+
     const category = await Category.findByIdAndDelete(req.params.id);
+
     if (!category) {
       return res.status(404).json({ message: "Category not found!!!" });
     } else {
@@ -63,14 +75,18 @@ exports.updateCategory = async (req, res) => {
     console.log(categoryNameExist);
     if (categoryNameExist) {
       if (categoryNameExist._id.equals(category._id)) {
-        return res.status(400).json({ message: 'Category is exits' })
+        return res.status(400).json({ message: "Category is exits" });
       }
     }
 
     category.categoryName = categoryName || category.categoryName;
     await category.save();
-    res.status(200).json({ message: "Category updated successfully!", category });
+    res
+      .status(200)
+      .json({ message: "Category updated successfully!", category });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };

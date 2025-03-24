@@ -47,6 +47,7 @@ const authenticate = (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized: Invalid token" });
 
     req.user = user;
+    req.userID = user._id.toString();
     next();
   })(req, res, next);
 };

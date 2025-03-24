@@ -1,4 +1,5 @@
 const BookMedia = require("../models/bookMedia.model");
+const Book = require("../models/book.model");
 
 exports.getAllBookMedia = async (req, res) => {
   try {
@@ -24,15 +25,20 @@ exports.getBookMediaById = async (req, res) => {
 
 exports.createBookMedia = async (req, res) => {
   try {
-    const { origin } = req.body;
+    const { origin, url } = req.body;
+    if (!origin || !url)
+      return res
+        .status(400)
+        .json({ message: "Origin or url is required field" });
 
-    const bookMediaexits = await BookMedia.findOne({ origin })
+    const bookMediaexits = await BookMedia.findOne({ origin });
     if (bookMediaexits) {
-      return res.status(400).json({ message: 'Book media existing' })
+      return res.status(400).json({ message: "Origin book media existing" });
     }
 
     const newBookMedia = new BookMedia({
       origin,
+      url,
     });
     await newBookMedia.save();
     res.status(201).json({
@@ -46,6 +52,9 @@ exports.createBookMedia = async (req, res) => {
 
 exports.deleteBookMedia = async (req, res) => {
   try {
+    const bookMediaInBook = await Book.findOne({ bookMedia: req.params.id });
+    if (bookMediaInBook)
+      return res.status(400).json({ message: "Have book media in Book!" });
     const book = await BookMedia.findByIdAndDelete(req.params.id);
     if (!book) {
       return res.status(404).json({ message: "Book media not found!!!" });
@@ -60,7 +69,7 @@ exports.deleteBookMedia = async (req, res) => {
 exports.updateBookMedia = async (req, res) => {
   try {
     const { id } = req.params;
-    const { origin } = req.body;
+    const { origin, url } = req.body;
 
     // Kiểm tra xem BookMedia có tồn tại không
     const bookMedia = await BookMedia.findById(id);
@@ -76,6 +85,7 @@ exports.updateBookMedia = async (req, res) => {
 
     // Cập nhật nếu hợp lệ
     bookMedia.origin = origin;
+    bookMedia.url = url;
     await bookMedia.save();
 
     res.status(200).json({

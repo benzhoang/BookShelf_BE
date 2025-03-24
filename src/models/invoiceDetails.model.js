@@ -6,6 +6,7 @@ const InvoiceDetailSchema = new Schema({
     invoiceID: {type: Schema.ObjectId, ref:"Invoice"},
     bookID: {type: Schema.ObjectId, ref: "Book"},
     quantity: {type: Number, required: true, default: 1},
+    price: {type: Number, required: true},
     available: {type: Boolean, default: "true"}
 
 }, {timestamps: true, versionKey: false});

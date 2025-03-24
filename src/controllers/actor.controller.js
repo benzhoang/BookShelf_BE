@@ -1,4 +1,5 @@
 const Actor = require("../models/actor.model");
+const Book = require("../models/book.model");
 
 exports.getAllActor = async (req, res) => {
   try {
@@ -50,7 +51,6 @@ exports.updateActor = async (req, res) => {
     });
     if (!actor) return res.status(404).json({ message: "Actor not found!!!" });
     res.status(200).json(actor);
-    
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -58,6 +58,11 @@ exports.updateActor = async (req, res) => {
 
 exports.deleteActor = async (req, res) => {
   try {
+    const actorInBook = await Book.findOne({ actor: req.params.id });
+    if (actorInBook)
+      return res.status(400).json({
+        message: "Can not delete this actor because it is in book",
+      });
     const actor = await Actor.findByIdAndDelete(req.params.id);
     if (!actor) return res.status(404).json({ message: "Actor not found!!!" });
     res.status(200).json({ message: "Delete actor successfully!!!" });

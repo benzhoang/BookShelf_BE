@@ -22,12 +22,18 @@ exports.getInvoiceDetailsById = async (req, res) => {
 
 exports.createInvoiceDetails = async (req, res) => {
   try {
-    const { invoiceID, bookID, quantity } = req.body;
+    const { invoiceID, bookID, quantity, price } = req.body;
+    if (!invoiceID || !bookID || !quantity || !price) {
+      return res
+        .status(400)
+        .json({ message: "Please is required!" });
+    }
 
     const newInvoiceDetail = new InvoiceDetails({
       invoiceID,
       bookID,
       quantity,
+      price,
     });
 
     res.status(201).json({
@@ -41,6 +47,18 @@ exports.createInvoiceDetails = async (req, res) => {
 
 exports.updateInvoiceDetails = async (req, res) => {
   try {
+    const { quantity } = req.body;
+    if (!quantity)
+      return res.status(400).json({ message: "Quantity is required!" });
+
+    const invoiceDetails = await InvoiceDetails.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!invoiceDetails)
+      return res.status(404).json({ message: "Invoice Id not found!" });
+    res.status(200).json(invoiceDetails);
   } catch (error) {}
 };
 

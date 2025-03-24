@@ -8,6 +8,7 @@ const UploadRouter = require("./upLoadImg.routes")
 const CategoryRouter = require('./category.routes')
 const InvoiceRouter = require('./invoice.routes')
 const PaymentRouter = require('./payment.routes')
+const InvoiceDetailsRouter = require('./invoiceDetails.routes')
 
 const {
   authenticate,
@@ -26,6 +27,7 @@ function Router(app) {
   app.use('/api/categories', CategoryRouter);
   app.use('/api/invoices', InvoiceRouter);
   app.use('/api/payments', PaymentRouter)
+  app.use('/api/invoicedetails', InvoiceDetailsRouter)
 }
 
 module.exports = Router;
