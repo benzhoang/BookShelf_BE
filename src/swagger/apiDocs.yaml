@@ -340,7 +340,7 @@ paths:
         "404":
           description: Book media origin already in data!!!
 
-  /api/bookmedia/{id}:
+  /api/bookmedias/{id}:
     get:
       summary: Get an book media by ID
       tags:
