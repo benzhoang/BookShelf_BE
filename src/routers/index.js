@@ -28,10 +28,10 @@ function Router(app) {
   app.use('/api/invoices', InvoiceRouter);
   app.use('/api/payments', PaymentRouter)
   app.use('/api/invoicedetails', InvoiceDetailsRouter)
+  app.get('/vnpay-ipn', (req, res) => {
+    console.log(req.query); // Nhận dữ liệu từ VNPAY
+    res.status(200).json({ message: 'IPN Received' });
+  });
 }
-app.get('/vnpay-ipn', (req, res) => {
-  console.log(req.query); // Nhận dữ liệu từ VNPAY
-  res.status(200).json({ message: 'IPN Received' });
-});
 
 module.exports = Router;
