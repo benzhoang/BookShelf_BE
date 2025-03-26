@@ -945,7 +945,7 @@ paths:
           in: path
           required: true
           schema:
-            type: onjectId  
+            type: string 
       responses:
         "200":
           description: Invoice details
