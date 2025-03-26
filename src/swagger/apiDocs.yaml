@@ -182,7 +182,7 @@ paths:
               schema:
                 type: object
 
-  /api/users/{id}:
+  /api/users/profile/{id}:
     get:
       summary: Get an users by ID
       tags:
@@ -196,6 +196,28 @@ paths:
       responses:
         "200":
           description: User details
+          content:
+            application/json:
+              schema:
+                type: object
+              properties: {}
+        "404":
+          description: User not found
+
+  /api/users/{id}:
+    delete:
+      summary: Delete an users by ID
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User delete
           content:
             application/json:
               schema:

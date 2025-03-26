@@ -4,7 +4,7 @@ const Book = require("../models/book.model");
 
 exports.getAllInvoice = async (req, res) => {
   try {
-    const invoice = await Invoice.find();
+    const invoice = await Invoice.find().populate({ path: 'userID', select: 'userName' });
     res.status(200).json(invoice);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -52,7 +52,7 @@ exports.getInvoiceByUserId = async (req, res) => {
 
 exports.createInvoice = async (req, res) => {
   try {
-    const {  paymentID, totalPrice, items } = req.body;
+    const { paymentID, totalPrice, items } = req.body;
     const userID = req.userID;
 
     // Check quantity
