@@ -8,6 +8,7 @@ const UserSchema = new Schema(
     email: { type: String, required: true },
     password: { type: String, required: function () { return !this.googleId; } },
     googleId: { type: String },
+    wallet: { type: Schema.Types.Double, default: 0 },
     role: { type: String, enum: ["Admin", "Manager", "Customer", "Staff"], default: "Customer" },
     accessToken: [{ type: String }],
     refreshToken: [{ type: String }],

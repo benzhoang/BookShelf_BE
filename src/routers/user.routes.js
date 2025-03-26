@@ -9,5 +9,6 @@ const {
 
 router.get("/", authenticate, authorizeAdmin, UserController.getAllUser);
 router.get("/profile", authenticate, UserController.getProfile);
+router.put("/wallet", authenticate, UserController.updateWallet);
 
 module.exports = router;

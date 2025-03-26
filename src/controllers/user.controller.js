@@ -38,3 +38,21 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+exports.updateWallet = async (req, res) => {
+  try {
+    const {wallet} = req.body;
+    const userId = req.userID;
+    console.log("Authenticated User ID:", userId);
+    if(!wallet) {
+      return res.status(400).json({message: "Wallet amount is required"});
+    }
+    const user = await User.findByIdAndUpdate(userId, {wallet: wallet}, {new: true}).select("-password -accessToken -refreshToken");
+    if(!user) {
+      return res.status(404).json({message: "User not found"});
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({message: error.message});
+  }
+}
