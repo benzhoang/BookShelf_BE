@@ -29,12 +29,14 @@ function Router(app) {
   app.use('/api/payments', PaymentRouter)
   app.use('/api/invoicedetails', InvoiceDetailsRouter)
   app.get("/vnpay-ipn", (req, res) => {
-    console.log("VNPAY IPN Received:", req.query);
-
-    // Phản hồi chuẩn VNPAY yêu cầu
+    console.log("Received VNPAY IPN:", req.query);
     res.status(200).send("1");
-});
+  });
 
+  app.post("/vnpay-ipn", (req, res) => {
+    console.log("Received VNPAY IPN via POST:", req.body);
+    res.status(200).send("1");
+  });
 }
 
 module.exports = Router;
