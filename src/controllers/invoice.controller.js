@@ -4,7 +4,10 @@ const Book = require("../models/book.model");
 
 exports.getAllInvoice = async (req, res) => {
   try {
-    const invoice = await Invoice.find().populate({ path: 'userID', select: 'userName' });
+    const invoice = await Invoice.find().populate({
+      path: "userID",
+      select: "userName",
+    });
     res.status(200).json(invoice);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -31,24 +34,6 @@ exports.getInvoiceByUserId = async (req, res) => {
   }
 };
 
-// exports.createInvoice = async (req, res) => {
-//   try {
-//     const { userID, paymentID, totalPrice } = req.body;
-
-//     const newInvoice = new Invoice({
-//       userID,
-//       paymentID,
-//       totalPrice
-//     });
-//     await newInvoice.save();
-//     res.status(201).json({
-//       message: "Create new invoice successfully",
-//       invoice: newInvoice,
-//     });
-//   } catch (error) {
-//     res.status(400).json({ message: error.message });
-//   }
-// };
 
 exports.createInvoice = async (req, res) => {
   try {
@@ -69,11 +54,9 @@ exports.createInvoice = async (req, res) => {
           .json({ message: `Sách "${book.bookName}" đã hết hàng` });
       }
       if (book.quantity < item.quantity) {
-        return res
-          .status(400)
-          .json({
-            message: `Sách "${book.bookName}" chỉ còn ${book.quantity} cuốn`,
-          });
+        return res.status(400).json({
+          message: `Sách "${book.bookName}" chỉ còn ${book.quantity} cuốn`,
+        });
       }
     }
 
@@ -120,6 +103,32 @@ exports.deleteInvoice = async (req, res) => {
     } else {
       res.status(200).json({ message: "Delete invoice successfully!!!" });
     }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+exports.updateInvoice = async (req, res) => {
+  try {
+    const { totalPrice, payStatus } = req.body;
+    if (!totalPrice || !payStatus) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const payStatusExist = ["Pending", "Success", "Fail"];
+    if (!payStatusExist.includes(payStatus)) {
+      return res.status(400).json({
+        message:
+          "payStatus must be one of the following values: Pending, Success, Fail",
+      });
+    }
+
+    const invoice = await Invoice.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    if (!invoice)
+      return res.status(404).json({ message: "Invoice not found!!!" });
+    res.status(200).json(invoice);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

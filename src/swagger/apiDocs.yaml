@@ -898,6 +898,32 @@ paths:
           description: Invoice id don't exits
         "400":
           description: Bad resquest in data
+    
+    put:
+      summary: Update an invoice by ID
+      tags:
+        - invoices
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            properties:
+              totalPrice:
+                type: number
+            example: { "totalPrice": 100, "payStatus": "Pending" }
+      responses:
+        "200":
+          description: invoice updated successfully
+        "404":
+          description: invoice not found
 
 #API Invoices Details============================================
   /api/invoicedetails:

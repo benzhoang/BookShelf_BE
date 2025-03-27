@@ -25,4 +25,6 @@ router.delete(
   InvoiceController.deleteInvoice
 );
 
+router.put("/:id", InvoiceController.updateInvoice);
+
 module.exports = router;
