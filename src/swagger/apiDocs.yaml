@@ -788,6 +788,9 @@ paths:
                 totalPrice:
                   type: number
                   description: Total price of the order
+                payStatus:
+                  type: string
+                  description: Payment status
                 items:
                   type: array
                   description: List of purchased books
@@ -807,10 +810,12 @@ paths:
                 - userID
                 - paymentID
                 - totalPrice
+                - payStatus
                 - items
               example:
                 paymentID: "67a4845d7d4d9186133c9a52"
                 totalPrice: 78000
+                payStatus: "Pending"
                 items:
                   - bookID: "67ac87bcfeebb0ff7141cc20"
                     quantity: 2
@@ -833,6 +838,8 @@ paths:
                       userID:
                         type: string
                       paymentID:
+                        type: string
+                      payStatus:
                         type: string
                       totalPrice:
                         type: number

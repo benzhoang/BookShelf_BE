@@ -34,7 +34,6 @@ exports.getInvoiceByUserId = async (req, res) => {
   }
 };
 
-
 exports.createInvoice = async (req, res) => {
   try {
     const { paymentID, totalPrice, items } = req.body;
@@ -60,11 +59,21 @@ exports.createInvoice = async (req, res) => {
       }
     }
 
+    // Check payStatus
+    const payStatus = req.body.payStatus || "Pending";
+    const payStatusExist = ["Pending", "Success", "Fail"];
+    if (!payStatusExist.includes(payStatus)) {
+      return res.status(400).json({
+        message:
+          "payStatus must be one of the following values: Pending, Success, Fail",
+      });
+    }
     // Create invoice
     const newInvoice = new Invoice({
       userID,
       paymentID,
       totalPrice,
+      payStatus,
     });
     await newInvoice.save();
 

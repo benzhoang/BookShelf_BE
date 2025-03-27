@@ -14,7 +14,7 @@ router.get("/", authenticate, authorizeAdmin, InvoiceController.getAllInvoice);
 router.post(
   "/",
   authenticate,
-  authorizeCustomer,
+  authorizeManager,
   InvoiceController.createInvoice
 );
 router.get("/:id", InvoiceController.getInvoiceById);
@@ -25,6 +25,18 @@ router.delete(
   InvoiceController.deleteInvoice
 );
 
-router.put("/:id", InvoiceController.updateInvoice);
+router.put(
+  "/:id",
+  authenticate,
+  authorizeAdmin,
+  InvoiceController.updateInvoice
+);
+
+router.get(
+  "/user/:userID",
+  authenticate,
+  authorizeCustomer,
+  InvoiceController.getInvoiceByUserId
+);
 
 module.exports = router;
