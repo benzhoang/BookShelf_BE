@@ -8,13 +8,14 @@ const {
   authorizeCustomer,
   authorizeManager,
   authorizeStaff,
+  authorizeManagerOrStaff
 } = require("../middlewares/auth.middleware");
 
 router.get("/", authenticate, authorizeAdmin, InvoiceController.getAllInvoice);
 router.post(
   "/",
   authenticate,
-  authorizeManager,
+  authorizeManagerOrStaff,
   InvoiceController.createInvoice
 );
 router.get("/:id", InvoiceController.getInvoiceById);

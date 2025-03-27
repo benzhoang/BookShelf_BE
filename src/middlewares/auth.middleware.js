@@ -52,6 +52,17 @@ const authenticate = (req, res, next) => {
   })(req, res, next);
 };
 
+const authorizeRoles = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    next();
+  };
+};
+
+const authorizeManagerOrStaff = authorizeRoles("Manager", "Staff");
+
 const authorizeAdmin = (req, res, next) => {
   if (req.user.role !== "Admin") {
     return res.status(403).json({ message: "Access denied" });
@@ -60,14 +71,14 @@ const authorizeAdmin = (req, res, next) => {
 };
 
 const authorizeManager = (req, res, next) => {
-  if (req.user.role !== "Manager") {
+  if (req.user.role !== "Manager" || "Staff") {
     return res.status(403).json({ message: "Access denied" });
   }
   next();
 };
 
 const authorizeCustomer = (req, res, next) => {
-  if (req.user.role !== "Customer") {
+  if (req.user.role !== "Manager") {
     return res.status(403).json({ message: "Access denied" });
   }
   next();
@@ -86,5 +97,6 @@ module.exports = {
   authorizeManager,
   authorizeStaff,
   authorizeCustomer,
+  authorizeManagerOrStaff,
   secretKey,
 };
