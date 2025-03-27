@@ -11,5 +11,6 @@ router.get("/", authenticate, authorizeAdmin, UserController.getAllUser);
 router.get("/profile", authenticate, UserController.getProfile);
 router.get("/profile/:id", authenticate, authorizeAdmin, UserController.getUserById);
 router.delete("/:id", authenticate, authorizeAdmin, UserController.deleteUser);
+router.put("/wallet", authenticate, UserController.updateWallet);
 
 module.exports = router;
