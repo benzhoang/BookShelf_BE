@@ -7,6 +7,10 @@ const CategorySchema = new Schema({
     type: String,
     required: true,
   },
+  image: {
+    type: String,
+    required: true,
+  },
   available: { type: Boolean, default: true }
 }, { versionKey: false, timestamps: true });
 

@@ -18,7 +18,9 @@ router.post(
   authorizeManagerOrStaff,
   InvoiceController.createInvoice
 );
+
 router.get("/:id", InvoiceController.getInvoiceById);
+
 router.delete(
   "/:id",
   authenticate,
